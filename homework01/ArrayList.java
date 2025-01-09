@@ -37,7 +37,8 @@ public class ArrayList<T> {
      * to cast an Object[] to a T[] to get the generic typing.
      */
     public ArrayList() {
-
+        size = 0;
+        backingArray = (T[]) new Object[INITIAL_CAPACITY];
     }
 
     /**
@@ -53,9 +54,29 @@ public class ArrayList<T> {
      * @throws java.lang.IllegalArgumentException  if data is null
      */
     public void addAtIndex(int index, T data) {
-
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index cannot be less than 1 or greater than the size of the ArrayList");
+        }
+        if (data == null) {
+            throw new IllegalArgumentException("Data being passed cannot be null");
+        }
+        if(size == INITIAL_CAPACITY) {
+            addCapacity();
+        }
+        for (int i = size; i > index; i--) {
+            backingArray[i] = backingArray[i - 1];
+        }
+        backingArray[index] = data;
+        size++;
     }
 
+    private void addCapacity() {
+        T[] newBackingArray = (T[]) new Object[INITIAL_CAPACITY * 2];
+        for (int i = 0; i < size; i++) {
+            newBackingArray[i] = backingArray[i];
+        }
+        backingArray = newBackingArray;
+    }
     /**
      * Adds the element to the front of the list.
      *
