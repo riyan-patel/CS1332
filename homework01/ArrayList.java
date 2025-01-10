@@ -20,7 +20,6 @@
  * 
  */
 public class ArrayList<T> {
-
     /**
      * The initial capacity of the ArrayList.
      *
