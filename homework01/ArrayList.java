@@ -1,20 +1,22 @@
+
+
 /**
  * Your implementation of an ArrayList.
  *
- * @author YOUR NAME HERE
+ * @author Riyan Patel
  * @version 1.0
- * @userid YOUR USER ID HERE (i.e. gburdell3)
- * @GTID YOUR GT ID HERE (i.e. 900000000)
+ * @userid rpatel816
+ * @GTID 903978548
  *
  * Collaborators: LIST ALL COLLABORATORS YOU WORKED WITH HERE
- *
+ * N/A
  * Resources: LIST ALL NON-COURSE RESOURCES YOU CONSULTED HERE
- * 
+ * N/A
  * By typing 'I agree' below, you are agreeing that this is your
  * own work and that you are responsible for all the contents of 
  * this file. If this is left blank, this homework will receive a zero.
  * 
- * Sign Here: REPLACE THIS TEXT
+ * Sign Here: I agree
  * 
  */
 public class ArrayList<T> {
@@ -88,7 +90,7 @@ public class ArrayList<T> {
      * @throws java.lang.IllegalArgumentException if data is null
      */
     public void addToFront(T data) {
-
+        addAtIndex(0, data);
     }
 
     /**
@@ -100,7 +102,7 @@ public class ArrayList<T> {
      * @throws java.lang.IllegalArgumentException if data is null
      */
     public void addToBack(T data) {
-
+        addAtIndex(size, data);
     }
 
     /**
@@ -115,7 +117,16 @@ public class ArrayList<T> {
      * @throws java.lang.IndexOutOfBoundsException if index < 0 or index >= size
      */
     public T removeAtIndex(int index) {
-
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("The index has to be between 0 to size.");
+        }
+        T removedElement = backingArray[index];
+        for (int i = index; i < size - 1; i++) {
+            backingArray[i] = backingArray[i + 1];
+        }
+        backingArray[size - 1] = null;
+        size--;
+        return removedElement;
     }
 
     /**
@@ -129,7 +140,7 @@ public class ArrayList<T> {
      * @throws java.util.NoSuchElementException if the list is empty
      */
     public T removeFromFront() {
-
+        return removeAtIndex(0);
     }
 
     /**
@@ -141,7 +152,7 @@ public class ArrayList<T> {
      * @throws java.util.NoSuchElementException if the list is empty
      */
     public T removeFromBack() {
-
+        return removeAtIndex(size - 1);
     }
 
     /**
@@ -154,7 +165,10 @@ public class ArrayList<T> {
      * @throws java.lang.IndexOutOfBoundsException if index < 0 or index >= size
      */
     public T get(int index) {
-
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("The index has to be between 0 to size - 1.");
+        }
+        return backingArray[index];
     }
 
     /**
@@ -165,7 +179,7 @@ public class ArrayList<T> {
      * @return true if empty, false otherwise
      */
     public boolean isEmpty() {
-
+        return size == 0;
     }
 
     /**
@@ -177,7 +191,8 @@ public class ArrayList<T> {
      * Must be O(1).
      */
     public void clear() {
-
+        backingArray = (T[]) new Object[INITIAL_CAPACITY];
+        size = 0;
     }
 
     /**
