@@ -56,12 +56,12 @@ public class ArrayList<T> {
      */
     public void addAtIndex(int index, T data) {
         if (index < 0 || index > size) {
-            throw new IndexOutOfBoundsException("Index cannot be less than 1 or greater than the size of the ArrayList");
+            throw new IndexOutOfBoundsException("The index should be between 0 to size.");
         }
         if (data == null) {
             throw new IllegalArgumentException("Data being passed cannot be null");
         }
-        if(size == INITIAL_CAPACITY) {
+        if (size == INITIAL_CAPACITY) {
             addCapacity();
         }
         for (int i = size; i > index; i--) {
@@ -70,7 +70,10 @@ public class ArrayList<T> {
         backingArray[index] = data;
         size++;
     }
-
+    /**
+     * Doubles the capacity of the backing array by creating a new array with
+     * twice the initial capacity and copying over the existing elements.
+     */
     private void addCapacity() {
         T[] newBackingArray = (T[]) new Object[INITIAL_CAPACITY * 2];
         for (int i = 0; i < size; i++) {
