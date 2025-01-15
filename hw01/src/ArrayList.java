@@ -62,24 +62,21 @@ public class ArrayList<T> {
             throw new IllegalArgumentException("Data being passed cannot be null");
         }
         if (size == INITIAL_CAPACITY) {
-            addCapacity();
-        }
-        for (int i = size; i > index; i--) {
-            backingArray[i] = backingArray[i - 1];
+            T[] newBackingArray = (T[]) new Object[INITIAL_CAPACITY * 2];
+            for (int i = 0; i < size; i++) {
+                if (i >= index) {
+                    newBackingArray[i + 1] = backingArray[i];
+                }
+                newBackingArray[i] = backingArray[i];
+            }
+            backingArray = newBackingArray;
+        } else {
+            for (int i = size; i > index; i--) {
+                backingArray[i] = backingArray[i - 1];
+            }
         }
         backingArray[index] = data;
         size++;
-    }
-    /**
-     * Doubles the capacity of the backing array by creating a new array with
-     * twice the initial capacity and copying over the existing elements.
-     */
-    private void addCapacity() {
-        T[] newBackingArray = (T[]) new Object[INITIAL_CAPACITY * 2];
-        for (int i = 0; i < size; i++) {
-            newBackingArray[i] = backingArray[i];
-        }
-        backingArray = newBackingArray;
     }
     /**
      * Adds the element to the front of the list.
