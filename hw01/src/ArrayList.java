@@ -1,4 +1,4 @@
-
+import java.util.NoSuchElementException;
 
 /**
  * Your implementation of an ArrayList.
@@ -139,6 +139,9 @@ public class ArrayList<T> {
      * @throws java.util.NoSuchElementException if the list is empty
      */
     public T removeFromFront() {
+        if (isEmpty()) {
+            throw new NoSuchElementException("List can't be empty.");
+        }
         return removeAtIndex(0);
     }
 
@@ -151,6 +154,9 @@ public class ArrayList<T> {
      * @throws java.util.NoSuchElementException if the list is empty
      */
     public T removeFromBack() {
+        if (isEmpty()) {
+            throw new NoSuchElementException("List can't be empty.");
+        }
         return removeAtIndex(size - 1);
     }
 
