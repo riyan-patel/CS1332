@@ -1,20 +1,22 @@
+import java.util.NoSuchElementException;
+
 /**
  * Your implementation of an ArrayQueue.
  *
- * @author YOUR NAME HERE
+ * @author Riyan Patel
  * @version 1.0
- * @userid YOUR USER ID HERE (i.e. gburdell3)
- * @GTID YOUR GT ID HERE (i.e. 900000000)
+ * @userid rpatel816
+ * @GTID 903978548
  *
  * Collaborators: LIST ALL COLLABORATORS YOU WORKED WITH HERE
- *
+ * N/A
  * Resources: LIST ALL NON-COURSE RESOURCES YOU CONSULTED HERE
- * 
+ * N/A
  * By typing 'I agree' below, you are agreeing that this is your
  * own work and that you are responsible for all the contents of 
  * this file. If this is left blank, this homework will receive a zero.
  * 
- * Agree Here: REPLACE THIS TEXT
+ * Agree Here: I agree
  * 
  */
 public class ArrayQueue<T> {
@@ -37,7 +39,9 @@ public class ArrayQueue<T> {
      * Constructs a new ArrayQueue.
      */
     public ArrayQueue() {
-
+        backingArray = (T[]) new Object[INITIAL_CAPACITY];
+        front = 0;
+        size = 0;
     }
 
     /**
@@ -53,7 +57,19 @@ public class ArrayQueue<T> {
      * @throws java.lang.IllegalArgumentException if data is null
      */
     public void enqueue(T data) {
-        System.out.println("enqueue");
+        if (data == null) {
+            throw new IllegalArgumentException("data cannot be null");
+        }
+        if (size == backingArray.length) {
+            T[] newArray = (T[]) new Object[backingArray.length * 2];
+            for (int i = 0; i < backingArray.length; i++) {
+                newArray[i] = backingArray[(front + i) % backingArray.length];
+            }
+            backingArray = newArray;
+            front = 0;
+        }
+        backingArray[(front + size) % backingArray.length] = data;
+        size++;
     }
 
     /**
@@ -72,7 +88,14 @@ public class ArrayQueue<T> {
      * @throws java.util.NoSuchElementException if the queue is empty
      */
     public T dequeue() {
-        return null;
+        if (size == 0) {
+            throw new NoSuchElementException("Queue is empty, cannot dequeue");
+        }
+        T data = backingArray[front];
+        backingArray[front] = null;
+        front = (front + 1) % backingArray.length;
+        size--;
+        return data;
     }
 
     /**
@@ -84,7 +107,10 @@ public class ArrayQueue<T> {
      * @throws java.util.NoSuchElementException if the queue is empty
      */
     public T peek() {
-        return null;
+        if (size == 0) {
+            throw new NoSuchElementException("Queue is empty, cannot peek");
+        }
+        return backingArray[front];
     }
 
     /**

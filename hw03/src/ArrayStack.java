@@ -3,20 +3,20 @@ import java.util.NoSuchElementException;
 /**
  * Your implementation of an ArrayStack.
  *
- * @author YOUR NAME HERE
+ * @author Riyan Patel
  * @version 1.0
- * @userid YOUR USER ID HERE (i.e. gburdell3)
- * @GTID YOUR GT ID HERE (i.e. 900000000)
+ * @userid rpatel816
+ * @GTID 903978548
  *
  * Collaborators: LIST ALL COLLABORATORS YOU WORKED WITH HERE
- *
+ * N/A
  * Resources: LIST ALL NON-COURSE RESOURCES YOU CONSULTED HERE
- * 
+ * N/A
  * By typing 'I agree' below, you are agreeing that this is your
  * own work and that you are responsible for all the contents of 
  * this file. If this is left blank, this homework will receive a zero.
  * 
- * Agree Here: REPLACE THIS TEXT
+ * Agree Here: i agree
  * 
  */
 public class ArrayStack<T> {
@@ -59,7 +59,7 @@ public class ArrayStack<T> {
         }
         if (size == backingArray.length) {
             T[] newArray = (T[]) new Object[backingArray.length * 2];
-            for (int i = 0; i < backingArray.length; i++) {
+            for (int i = 0; i < size; i++) {
                 newArray[i] = backingArray[i];
             }
             backingArray = newArray;

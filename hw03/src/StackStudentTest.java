@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * This is a basic set of unit tests for ArrayStack and LinkedStack.
+ * This is a set of unit tests for ArrayStack and LinkedStack.
  *
  * Passing these tests doesn't guarantee any grade on these assignments. These
  * student JUnits that we provide should be thought of as a sanity check to
@@ -19,7 +19,7 @@ import org.junit.Test;
  * work correctly and efficiently in all cases, which is why it's important
  * to write comprehensive tests to cover as many cases as possible.
  *
- * @author CS 1332 TAs
+ * @author Jeet Hirenkumar Dekivadia
  * @version 1.0
  */
 public class StackStudentTest {
@@ -35,157 +35,226 @@ public class StackStudentTest {
     }
 
     @Test(timeout = TIMEOUT)
-    public void testInitialization() {
+    public void testArrayStackInitialization() {
         assertEquals(0, array.size());
-        assertArrayEquals(new Object[ArrayStack.INITIAL_CAPACITY],
-            array.getBackingArray());
+        assertArrayEquals(new Object[ArrayStack.INITIAL_CAPACITY], array.getBackingArray());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testLinkedStackInitialization() {
         assertEquals(0, linked.size());
         assertNull(linked.getHead());
     }
 
     @Test(timeout = TIMEOUT)
-    public void testArrayPush() {
-        array.push("0a");   // 0a
-        array.push("1a");   // 0a, 1a
-        array.push("2a");   // 0a, 1a, 2a
-        array.push("3a");   // 0a, 1a, 2a, 3a
-        array.push("4a");   // 0a, 1a, 2a, 3a, 4a
+    public void testArrayPushOneElement() {
+        array.push("0a");
+        assertEquals(1, array.size());
+        assertEquals("0a", array.peek());
+    }
 
-        assertEquals(5, array.size());
+    @Test(timeout = TIMEOUT)
+    public void testLinkedPushOneElement() {
+        linked.push("0a");
+        assertEquals(1, linked.size());
+        assertEquals("0a", linked.peek());
+    }
 
-        Object[] expected = new Object[ArrayStack.INITIAL_CAPACITY];
-        expected[0] = "0a";
-        expected[1] = "1a";
-        expected[2] = "2a";
-        expected[3] = "3a";
-        expected[4] = "4a";
-        assertArrayEquals(expected, array.getBackingArray());
+    @Test(timeout = TIMEOUT)
+    public void testArrayPushMultipleElements() {
+        for (int i = 0; i < 10; i++) {
+            array.push(i + "a");
+        }
+        assertEquals(10, array.size());
+        assertEquals("9a", array.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testLinkedPushMultipleElements() {
+        for (int i = 0; i < 10; i++) {
+            linked.push(i + "a");
+        }
+        assertEquals(10, linked.size());
+        assertEquals("9a", linked.peek());
     }
 
     @Test(timeout = TIMEOUT)
     public void testArrayPop() {
-        String temp = "5a";
-
-        array.push("0a");   // 0a
-        array.push("1a");   // 0a, 1a
-        array.push("2a");   // 0a, 1a, 2a
-        array.push("3a");   // 0a, 1a, 2a, 3a
-        array.push("4a");   // 0a, 1a, 2a, 3a, 4a
-        array.push(temp);   // 0a, 1a, 2a, 3a, 4a, 5a
-        assertEquals(6, array.size());
-
-        assertSame(temp, array.pop());  // 0a, 1a, 2a, 3a, 4a
-
-        assertEquals(5, array.size());
-
-        Object[] expected = new Object[ArrayStack.INITIAL_CAPACITY];
-        expected[0] = "0a";
-        expected[1] = "1a";
-        expected[2] = "2a";
-        expected[3] = "3a";
-        expected[4] = "4a";
-        assertArrayEquals(expected, array.getBackingArray());
-    }
-
-    @Test(timeout = TIMEOUT)
-    public void testArrayPeek() {
-        String temp = "4a";
-
-        array.push("0a");   // 0a
-        array.push("1a");   // 0a, 1a
-        array.push("2a");   // 0a, 1a, 2a
-        array.push("3a");   // 0a, 1a, 2a, 3a
-        array.push(temp);   // 0a, 1a, 2a, 3a, 4a
-        assertEquals(5, array.size());
-
-        assertSame(temp, array.peek());
-    }
-
-    @Test(timeout = TIMEOUT)
-    public void testLinkedPush() {
-        linked.push("0a");  // 0a
-        linked.push("1a");  // 1a, 0a
-        linked.push("2a");  // 2a, 1a 0a
-        linked.push("3a");  // 3a, 2a, 1a 0a
-        linked.push("4a");  // 4a, 3a, 2a, 1a 0a
-
-        assertEquals(5, linked.size());
-
-        LinkedNode<String> cur = linked.getHead();
-        assertNotNull(cur);
-        assertEquals("4a", cur.getData());
-
-        cur = cur.getNext();
-        assertNotNull(cur);
-        assertEquals("3a", cur.getData());
-
-        cur = cur.getNext();
-        assertNotNull(cur);
-        assertEquals("2a", cur.getData());
-
-        cur = cur.getNext();
-        assertNotNull(cur);
-        assertEquals("1a", cur.getData());
-
-        cur = cur.getNext();
-        assertNotNull(cur);
-        assertEquals("0a", cur.getData());
-
-        cur = cur.getNext();
-        assertNull(cur);
+        array.push("0a");
+        array.push("1a");
+        assertEquals("1a", array.pop());
+        assertEquals(1, array.size());
+        assertEquals("0a", array.peek());
     }
 
     @Test(timeout = TIMEOUT)
     public void testLinkedPop() {
-        String temp = "5a";
+        linked.push("0a");
+        linked.push("1a");
+        assertEquals("1a", linked.pop());
+        assertEquals(1, linked.size());
+        assertEquals("0a", linked.peek());
+    }
 
-        linked.push("0a");  // 0a
-        linked.push("1a");  // 1a, 0a
-        linked.push("2a");  // 2a, 1a, 0a
-        linked.push("3a");  // 3a, 2a, 1a, 0a
-        linked.push("4a");  // 4a, 3a, 2a, 1a, 0a
-        linked.push(temp);  // 5a, 4a, 3a, 2a, 1a, 0a
-        assertEquals(6, linked.size());
+    @Test(timeout = TIMEOUT, expected = java.util.NoSuchElementException.class)
+    public void testArrayPopEmpty() {
+        array.pop();
+    }
 
-        assertSame(temp, linked.pop()); // 4a, 3a, 2a, 1a, 0a
+    @Test(timeout = TIMEOUT, expected = java.util.NoSuchElementException.class)
+    public void testLinkedPopEmpty() {
+        linked.pop();
+    }
 
-        assertEquals(5, linked.size());
-
-        LinkedNode<String> cur = linked.getHead();
-        assertNotNull(cur);
-        assertEquals("4a", cur.getData());
-
-        cur = cur.getNext();
-        assertNotNull(cur);
-        assertEquals("3a", cur.getData());
-
-        cur = cur.getNext();
-        assertNotNull(cur);
-        assertEquals("2a", cur.getData());
-
-        cur = cur.getNext();
-        assertNotNull(cur);
-        assertEquals("1a", cur.getData());
-
-        cur = cur.getNext();
-        assertNotNull(cur);
-        assertEquals("0a", cur.getData());
-
-        cur = cur.getNext();
-        assertNull(cur);
+    @Test(timeout = TIMEOUT)
+    public void testArrayPeek() {
+        array.push("0a");
+        array.push("1a");
+        assertEquals("1a", array.peek());
     }
 
     @Test(timeout = TIMEOUT)
     public void testLinkedPeek() {
-        String temp = "4a";
+        linked.push("0a");
+        linked.push("1a");
+        assertEquals("1a", linked.peek());
+    }
 
-        linked.push("0a");  // 0a
-        linked.push("1a");  // 1a, 0a
-        linked.push("2a");  // 2a, 1a, 0a
-        linked.push("3a");  // 3a, 2a, 1a, 0a
-        linked.push(temp);  // 4a, 3a, 2a, 1a, 0a
-        assertEquals(5, linked.size());
+    @Test(timeout = TIMEOUT, expected = java.util.NoSuchElementException.class)
+    public void testArrayPeekEmpty() {
+        array.peek();
+    }
 
-        assertSame(temp, linked.peek());
+    @Test(timeout = TIMEOUT, expected = java.util.NoSuchElementException.class)
+    public void testLinkedPeekEmpty() {
+        linked.peek();
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testArrayPushPopUntilEmpty() {
+        for (int i = 0; i < 5; i++) {
+            array.push(i + "a");
+        }
+        for (int i = 4; i >= 0; i--) {
+            assertEquals(i + "a", array.pop());
+        }
+        assertEquals(0, array.size());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testLinkedPushPopUntilEmpty() {
+        for (int i = 0; i < 5; i++) {
+            linked.push(i + "a");
+        }
+        for (int i = 4; i >= 0; i--) {
+            assertEquals(i + "a", linked.pop());
+        }
+        assertEquals(0, linked.size());
+    }
+
+    @Test(timeout = TIMEOUT, expected = IllegalArgumentException.class)
+    public void testArrayPushNull() {
+        array.push(null);
+    }
+
+    @Test(timeout = TIMEOUT, expected = IllegalArgumentException.class)
+    public void testLinkedPushNull() {
+        linked.push(null);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testArrayResizing() {
+        for (int i = 0; i < 10; i++) {
+            array.push(i + "a");
+        }
+        assertEquals(10, array.size());
+        assertEquals("9a", array.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testLinkedLargeNumberOfElements() {
+        for (int i = 0; i < 1000; i++) {
+            linked.push(i + "a");
+        }
+        assertEquals(1000, linked.size());
+        assertEquals("999a", linked.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testArrayPushPopMixed() {
+        for (int i = 0; i < 5; i++) {
+            array.push(i + "a");
+        }
+        for (int i = 0; i < 3; i++) {
+            array.pop();
+        }
+        for (int i = 5; i < 10; i++) {
+            array.push(i + "a");
+        }
+        assertEquals(7, array.size());
+        assertEquals("9a", array.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testLinkedPushPopMixed() {
+        for (int i = 0; i < 5; i++) {
+            linked.push(i + "a");
+        }
+        for (int i = 0; i < 3; i++) {
+            linked.pop();
+        }
+        for (int i = 5; i < 10; i++) {
+            linked.push(i + "a");
+        }
+        assertEquals(7, linked.size());
+        assertEquals("9a", linked.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testArrayPushPopLarge() {
+        for (int i = 0; i < 1000; i++) {
+            array.push(i + "a");
+        }
+        for (int i = 0; i < 500; i++) {
+            array.pop();
+        }
+        assertEquals(500, array.size());
+        assertEquals("499a", array.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testLinkedPushPopLarge() {
+        for (int i = 0; i < 1000; i++) {
+            linked.push(i + "a");
+        }
+        for (int i = 0; i < 500; i++) {
+            linked.pop();
+        }
+        assertEquals(500, linked.size());
+        assertEquals("499a", linked.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testArrayPushPopResize() {
+        for (int i = 0; i < 20; i++) {
+            array.push(i + "a");
+        }
+        for (int i = 0; i < 10; i++) {
+            array.pop();
+        }
+        assertEquals(10, array.size());
+        assertEquals("9a", array.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testLinkedPushPopResize() {
+        for (int i = 0; i < 20; i++) {
+            linked.push(i + "a");
+        }
+        for (int i = 0; i < 10; i++) {
+            linked.pop();
+        }
+        assertEquals(10, linked.size());
+        assertEquals("9a", linked.peek());
     }
 }

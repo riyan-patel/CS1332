@@ -1,20 +1,22 @@
+import java.util.NoSuchElementException;
+
 /**
  * Your implementation of a LinkedQueue. It should NOT be circular.
  *
- * @author YOUR NAME HERE
+ * @author Riyan Patel
  * @version 1.0
- * @userid YOUR USER ID HERE (i.e. gburdell3)
- * @GTID YOUR GT ID HERE (i.e. 900000000)
+ * @userid rpatel816
+ * @GTID 903978548
  *
  * Collaborators: LIST ALL COLLABORATORS YOU WORKED WITH HERE
- *
+ * N/A
  * Resources: LIST ALL NON-COURSE RESOURCES YOU CONSULTED HERE
- * 
+ * N/A
  * By typing 'I agree' below, you are agreeing that this is your
  * own work and that you are responsible for all the contents of 
  * this file. If this is left blank, this homework will receive a zero.
  * 
- * Agree Here: REPLACE THIS TEXT
+ * Agree Here: I agree
  * 
  */
 public class LinkedQueue<T> {
@@ -39,7 +41,18 @@ public class LinkedQueue<T> {
      * @throws java.lang.IllegalArgumentException if data is null
      */
     public void enqueue(T data) {
-
+        if (data == null) {
+            throw new IllegalArgumentException("Data is null, cannot enqueue");
+        }
+        LinkedNode<T> newNode = new LinkedNode<>(data);
+        if (head == null) {
+            head = newNode;
+            tail = newNode;
+        } else {
+            tail.setNext(newNode);
+        }
+        tail = newNode;
+        size++;
     }
 
     /**
@@ -51,7 +64,13 @@ public class LinkedQueue<T> {
      * @throws java.util.NoSuchElementException if the queue is empty
      */
     public T dequeue() {
-        return null;
+        if (size == 0) {
+            throw new NoSuchElementException("Queue is empty, cannot dequeue");
+        }
+        T data = head.getData();
+        head = head.getNext();
+        size--;
+        return data;
     }
 
     /**
@@ -63,7 +82,10 @@ public class LinkedQueue<T> {
      * @throws java.util.NoSuchElementException if the queue is empty
      */
     public T peek() {
-        return null;
+        if (size == 0) {
+            throw new NoSuchElementException("Queue is empty, cannot peek");
+        }
+        return head.getData();
     }
 
     /**

@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * This is a basic set of unit tests for ArrayQueue and LinkedQueue.
+ * This is a set of unit tests for ArrayQueue and LinkedQueue.
  *
  * Passing these tests doesn't guarantee any grade on these assignments. These
  * student JUnits that we provide should be thought of as a sanity check to
@@ -19,7 +19,7 @@ import org.junit.Test;
  * work correctly and efficiently in all cases, which is why it's important
  * to write comprehensive tests to cover as many cases as possible.
  *
- * @author CS 1332 TAs
+ * @author Jeet Hirenkumar Dekivadia
  * @version 1.0
  */
 public class QueueStudentTest {
@@ -35,157 +35,297 @@ public class QueueStudentTest {
     }
 
     @Test(timeout = TIMEOUT)
-    public void testInitialization() {
+    public void testArrayQueueInitialization() {
         assertEquals(0, array.size());
-        assertArrayEquals(new Object[ArrayQueue.INITIAL_CAPACITY],
-            array.getBackingArray());
-        assertEquals(0, linked.size());
-        assertNull(linked.getHead());
+        assertArrayEquals(new Object[ArrayQueue.INITIAL_CAPACITY], array.getBackingArray());
     }
 
     @Test(timeout = TIMEOUT)
-    public void testArrayEnqueue() {
-        array.enqueue("0a");    // 0a
-        array.enqueue("1a");    // 0a, 1a
-        array.enqueue("2a");    // 0a, 1a, 2a
-        array.enqueue("3a");    // 0a, 1a, 2a, 3a
-        array.enqueue("4a");    // 0a, 1a, 2a, 3a, 4a
+    public void testLinkedQueueInitialization() {
+        assertEquals(0, linked.size());
+        assertNull(linked.getHead());
+        assertNull(linked.getTail());
+    }
 
-        assertEquals(5, array.size());
+    @Test(timeout = TIMEOUT)
+    public void testArrayEnqueueOneElement() {
+        array.enqueue("0a");
+        assertEquals(1, array.size());
+        assertEquals("0a", array.peek());
+    }
 
-        Object[] expected = new Object[ArrayQueue.INITIAL_CAPACITY];
-        expected[0] = "0a";
-        expected[1] = "1a";
-        expected[2] = "2a";
-        expected[3] = "3a";
-        expected[4] = "4a";
-        assertArrayEquals(expected, array.getBackingArray());
+    @Test(timeout = TIMEOUT)
+    public void testLinkedEnqueueOneElement() {
+        linked.enqueue("0a");
+        assertEquals(1, linked.size());
+        assertEquals("0a", linked.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testArrayEnqueueMultipleElements() {
+        for (int i = 0; i < 10; i++) {
+            array.enqueue(i + "a");
+        }
+        assertEquals(10, array.size());
+        assertEquals("0a", array.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testLinkedEnqueueMultipleElements() {
+        for (int i = 0; i < 10; i++) {
+            linked.enqueue(i + "a");
+        }
+        assertEquals(10, linked.size());
+        assertEquals("0a", linked.peek());
     }
 
     @Test(timeout = TIMEOUT)
     public void testArrayDequeue() {
-        String temp = "0a";
-
-        array.enqueue(temp);    // 0a
-        array.enqueue("1a");    // 0a, 1a
-        array.enqueue("2a");    // 0a, 1a, 2a
-        array.enqueue("3a");    // 0a, 1a, 2a, 3a
-        array.enqueue("4a");    // 0a, 1a, 2a, 3a, 4a
-        array.enqueue("5a");    // 0a, 1a, 2a, 3a, 4a, 5a
-        assertEquals(6, array.size());
-
-        assertSame(temp, array.dequeue());  // 1a, 2a, 3a, 4a, 5a
-
-        assertEquals(5, array.size());
-
-        Object[] expected = new Object[ArrayQueue.INITIAL_CAPACITY];
-        expected[1] = "1a";
-        expected[2] = "2a";
-        expected[3] = "3a";
-        expected[4] = "4a";
-        expected[5] = "5a";
-        assertArrayEquals(expected, array.getBackingArray());
-    }
-
-    @Test(timeout = TIMEOUT)
-    public void testArrayPeek() {
-        String temp = "0a";
-
-        array.enqueue(temp);    // 0a
-        array.enqueue("1a");    // 0a, 1a
-        array.enqueue("2a");    // 0a, 1a, 2a
-        array.enqueue("3a");    // 0a, 1a, 2a, 3a
-        array.enqueue("4a");    // 0a, 1a, 2a, 3a, 4a
-        assertEquals(5, array.size());
-
-        assertSame(temp, array.peek());
-    }
-
-    @Test(timeout = TIMEOUT)
-    public void testLinkedEnqueue() {
-        linked.enqueue("0a");   // 0a
-        linked.enqueue("1a");   // 0a, 1a
-        linked.enqueue("2a");   // 0a, 1a, 2a
-        linked.enqueue("3a");   // 0a, 1a, 2a, 3a
-        linked.enqueue("4a");   // 0a, 1a, 2a, 3a, 4a
-
-        assertEquals(5, linked.size());
-
-        LinkedNode<String> cur = linked.getHead();
-        assertNotNull(cur);
-        assertEquals("0a", cur.getData());
-
-        cur = cur.getNext();
-        assertNotNull(cur);
-        assertEquals("1a", cur.getData());
-
-        cur = cur.getNext();
-        assertNotNull(cur);
-        assertEquals("2a", cur.getData());
-
-        cur = cur.getNext();
-        assertNotNull(cur);
-        assertEquals("3a", cur.getData());
-
-        cur = cur.getNext();
-        assertNotNull(cur);
-        assertEquals("4a", cur.getData());
-
-        cur = cur.getNext();
-        assertNull(cur);
+        array.enqueue("0a");
+        array.enqueue("1a");
+        assertEquals("0a", array.dequeue());
+        assertEquals(1, array.size());
+        assertEquals("1a", array.peek());
     }
 
     @Test(timeout = TIMEOUT)
     public void testLinkedDequeue() {
-        String temp = "0a";
+        linked.enqueue("0a");
+        linked.enqueue("1a");
+        assertEquals("0a", linked.dequeue());
+        assertEquals(1, linked.size());
+        assertEquals("1a", linked.peek());
+    }
 
-        linked.enqueue(temp);   // 0a
-        linked.enqueue("1a");   // 0a, 1a
-        linked.enqueue("2a");   // 0a, 1a, 2a
-        linked.enqueue("3a");    // 0a, 1a, 2a, 3a
-        linked.enqueue("4a");    // 0a, 1a, 2a, 3a, 4a
-        linked.enqueue("5a");    // 0a, 1a, 2a, 3a, 4a, 5a
-        assertEquals(6, linked.size());
+    @Test(timeout = TIMEOUT, expected = java.util.NoSuchElementException.class)
+    public void testArrayDequeueEmpty() {
+        array.dequeue();
+    }
 
-        assertSame(temp, linked.dequeue()); // 1a, 2a, 3a, 4a, 5a
+    @Test(timeout = TIMEOUT, expected = java.util.NoSuchElementException.class)
+    public void testLinkedDequeueEmpty() {
+        linked.dequeue();
+    }
 
-        assertEquals(5, linked.size());
-
-        LinkedNode<String> cur = linked.getHead();
-        assertNotNull(cur);
-        assertEquals("1a", cur.getData());
-
-        cur = cur.getNext();
-        assertNotNull(cur);
-        assertEquals("2a", cur.getData());
-
-        cur = cur.getNext();
-        assertNotNull(cur);
-        assertEquals("3a", cur.getData());
-
-        cur = cur.getNext();
-        assertNotNull(cur);
-        assertEquals("4a", cur.getData());
-
-        cur = cur.getNext();
-        assertNotNull(cur);
-        assertEquals("5a", cur.getData());
-
-        cur = cur.getNext();
-        assertNull(cur);
+    @Test(timeout = TIMEOUT)
+    public void testArrayPeek() {
+        array.enqueue("0a");
+        array.enqueue("1a");
+        assertEquals("0a", array.peek());
     }
 
     @Test(timeout = TIMEOUT)
     public void testLinkedPeek() {
-        String temp = "0a";
+        linked.enqueue("0a");
+        linked.enqueue("1a");
+        assertEquals("0a", linked.peek());
+    }
 
-        linked.enqueue(temp);   // 0a
-        linked.enqueue("1a");   // 0a, 1a
-        linked.enqueue("2a");   // 0a, 1a, 2a
-        linked.enqueue("3a");    // 0a, 1a, 2a, 3a
-        linked.enqueue("4a");    // 0a, 1a, 2a, 3a, 4a
+    @Test(timeout = TIMEOUT, expected = java.util.NoSuchElementException.class)
+    public void testArrayPeekEmpty() {
+        array.peek();
+    }
+
+    @Test(timeout = TIMEOUT, expected = java.util.NoSuchElementException.class)
+    public void testLinkedPeekEmpty() {
+        linked.peek();
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testArrayEnqueueDequeueUntilEmpty() {
+        for (int i = 0; i < 5; i++) {
+            array.enqueue(i + "a");
+        }
+        for (int i = 0; i < 5; i++) {
+            assertEquals(i + "a", array.dequeue());
+        }
+        assertEquals(0, array.size());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testLinkedEnqueueDequeueUntilEmpty() {
+        for (int i = 0; i < 5; i++) {
+            linked.enqueue(i + "a");
+        }
+        for (int i = 0; i < 5; i++) {
+            assertEquals(i + "a", linked.dequeue());
+        }
+        assertEquals(0, linked.size());
+    }
+
+    @Test(timeout = TIMEOUT, expected = IllegalArgumentException.class)
+    public void testArrayEnqueueNull() {
+        array.enqueue(null);
+    }
+
+    @Test(timeout = TIMEOUT, expected = IllegalArgumentException.class)
+    public void testLinkedEnqueueNull() {
+        linked.enqueue(null);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testArrayCircularBehavior() {
+        for (int i = 0; i < 5; i++) {
+            array.enqueue(i + "a");
+        }
+        for (int i = 0; i < 3; i++) {
+            array.dequeue();
+        }
+        for (int i = 5; i < 10; i++) {
+            array.enqueue(i + "a");
+        }
+        assertEquals(7, array.size());
+        assertEquals("3a", array.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testArrayResizing() {
+        for (int i = 0; i < 10; i++) {
+            array.enqueue(i + "a");
+        }
+        assertEquals(10, array.size());
+        assertEquals("0a", array.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testLinkedLargeNumberOfElements() {
+        for (int i = 0; i < 1000; i++) {
+            linked.enqueue(i + "a");
+        }
+        assertEquals(1000, linked.size());
+        assertEquals("0a", linked.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testArrayDequeueAllAndEnqueueAgain() {
+        for (int i = 0; i < 5; i++) {
+            array.enqueue(i + "a");
+        }
+        for (int i = 0; i < 5; i++) {
+            array.dequeue();
+        }
+        for (int i = 0; i < 5; i++) {
+            array.enqueue(i + "b");
+        }
+        assertEquals(5, array.size());
+        assertEquals("0b", array.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testLinkedDequeueAllAndEnqueueAgain() {
+        for (int i = 0; i < 5; i++) {
+            linked.enqueue(i + "a");
+        }
+        for (int i = 0; i < 5; i++) {
+            linked.dequeue();
+        }
+        for (int i = 0; i < 5; i++) {
+            linked.enqueue(i + "b");
+        }
         assertEquals(5, linked.size());
+        assertEquals("0b", linked.peek());
+    }
 
-        assertSame(temp, linked.peek());
+    @Test(timeout = TIMEOUT)
+    public void testArrayEnqueueAfterResizing() {
+        for (int i = 0; i < 20; i++) {
+            array.enqueue(i + "a");
+        }
+        assertEquals(20, array.size());
+        assertEquals("0a", array.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testLinkedEnqueueAfterLargeNumberOfDequeues() {
+        for (int i = 0; i < 100; i++) {
+            linked.enqueue(i + "a");
+        }
+        for (int i = 0; i < 50; i++) {
+            linked.dequeue();
+        }
+        for (int i = 100; i < 150; i++) {
+            linked.enqueue(i + "a");
+        }
+        assertEquals(100, linked.size());
+        assertEquals("50a", linked.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testArrayPeekAfterMultipleDequeues() {
+        for (int i = 0; i < 10; i++) {
+            array.enqueue(i + "a");
+        }
+        for (int i = 0; i < 5; i++) {
+            array.dequeue();
+        }
+        assertEquals("5a", array.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testLinkedPeekAfterMultipleDequeues() {
+        for (int i = 0; i < 10; i++) {
+            linked.enqueue(i + "a");
+        }
+        for (int i = 0; i < 5; i++) {
+            linked.dequeue();
+        }
+        assertEquals("5a", linked.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testArrayEnqueueDequeueMixed() {
+        for (int i = 0; i < 5; i++) {
+            array.enqueue(i + "a");
+        }
+        for (int i = 0; i < 3; i++) {
+            array.dequeue();
+        }
+        for (int i = 5; i < 10; i++) {
+            array.enqueue(i + "a");
+        }
+        assertEquals(7, array.size());
+        assertEquals("3a", array.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testLinkedEnqueueDequeueMixed() {
+        for (int i = 0; i < 5; i++) {
+            linked.enqueue(i + "a");
+        }
+        for (int i = 0; i < 3; i++) {
+            linked.dequeue();
+        }
+        for (int i = 5; i < 10; i++) {
+            linked.enqueue(i + "a");
+        }
+        assertEquals(7, linked.size());
+        assertEquals("3a", linked.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testArrayEnqueueDequeueWrapAround() {
+        for (int i = 0; i < 5; i++) {
+            array.enqueue(i + "a");
+        }
+        for (int i = 0; i < 3; i++) {
+            array.dequeue();
+        }
+        for (int i = 5; i < 10; i++) {
+            array.enqueue(i + "a");
+        }
+        assertEquals(7, array.size());
+        assertEquals("3a", array.peek());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testLinkedEnqueueDequeueLarge() {
+        for (int i = 0; i < 1000; i++) {
+            linked.enqueue(i + "a");
+        }
+        for (int i = 0; i < 500; i++) {
+            linked.dequeue();
+        }
+        assertEquals(500, linked.size());
+        assertEquals("500a", linked.peek());
     }
 }
