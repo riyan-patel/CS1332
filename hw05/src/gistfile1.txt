@@ -50,9 +50,9 @@ public class MaxHeapStudentTest {
          * 1 4
          * / \
          * 6 8
-         *
+         * 
          * ->
-         *
+         * 
          * 8
          * / \
          * 6 4
@@ -178,7 +178,7 @@ public class MaxHeapStudentTest {
 
     @Test(timeout = TIMEOUT)
     public void testRemoveOne() { // to make sure downHeap isn't called on empty array if remove is called on heap
-        // of size 1
+                                  // of size 1
         heap.add(1);
         heap.remove();
     }
