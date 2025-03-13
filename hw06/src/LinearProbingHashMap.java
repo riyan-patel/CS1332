@@ -1,23 +1,27 @@
-import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
 
 /**
  * Your implementation of a LinearProbingHashMap.
  *
- * @author YOUR NAME HERE
+ * @author Riyan Patel
  * @version 1.0
- * @userid YOUR USER ID HERE (i.e. gburdell3)
- * @GTID YOUR GT ID HERE (i.e. 900000000)
+ * @userid rpatel816
+ * @GTID 903978548
  *
  * Collaborators: LIST ALL COLLABORATORS YOU WORKED WITH HERE
- *
+ * NA
  * Resources: LIST ALL NON-COURSE RESOURCES YOU CONSULTED HERE
- * 
+ * NA
  * By typing 'I agree' below, you are agreeing that this is your
- * own work and that you are responsible for all the contents of 
+ * own work and that you are responsible for all the contents of
  * this file. If this is left blank, this homework will receive a zero.
- * 
- * Agree Here: REPLACE THIS TEXT
+ *
+ * Agree Here: I agree
  */
 public class LinearProbingHashMap<K, V> {
 
@@ -48,7 +52,7 @@ public class LinearProbingHashMap<K, V> {
      * Use constructor chaining.
      */
     public LinearProbingHashMap() {
-
+        this(INITIAL_CAPACITY);
     }
 
     /**
@@ -61,7 +65,8 @@ public class LinearProbingHashMap<K, V> {
      * @param initialCapacity the initial capacity of the backing array
      */
     public LinearProbingHashMap(int initialCapacity) {
-
+        table = (LinearProbingMapEntry<K, V>[]) new LinearProbingMapEntry[initialCapacity];
+        size = 0;
     }
 
     /**
@@ -84,7 +89,7 @@ public class LinearProbingHashMap<K, V> {
      * division when calculating load factor.
      *
      * When regrowing, resize the length of the backing table to
-     * 2 * old length + 1. You must use the resizeBackingTable method to do so.
+     * 2 * old length + 1. You must use the resizetable method to do so.
      *
      * Return null if the key was not already in the map. If it was in the map,
      * return the old value associated with it.
@@ -96,6 +101,33 @@ public class LinearProbingHashMap<K, V> {
      * @throws java.lang.IllegalArgumentException if key or value is null
      */
     public V put(K key, V value) {
+        if (key == null || value == null) {
+            throw new IllegalArgumentException("Key or value cannot be null.");
+        }
+        if ((size + 1.0) / table.length > MAX_LOAD_FACTOR) {
+            resizeBackingTable((2 * table.length) + 1);
+        }
+        int index = Math.abs(key.hashCode()) % table.length;
+        int firstRemovedIndex = -1;
+        while (table[index] != null) {
+            if (table[index].isRemoved()) {
+                if (firstRemovedIndex == -1) {
+                    firstRemovedIndex = index;
+                }
+            } else if (table[index].getKey().equals(key)) {
+                V oldValue = table[index].getValue();
+                table[index].setValue(value);
+                return oldValue;
+            }
+            index = (index + 1) % table.length;
+        }
+        if (firstRemovedIndex != -1) {
+            table[firstRemovedIndex] = new LinearProbingMapEntry<>(key, value);
+        } else {
+            table[index] = new LinearProbingMapEntry<>(key, value);
+        }
+        size++;
+        return null;
 
     }
 
@@ -109,7 +141,24 @@ public class LinearProbingHashMap<K, V> {
      * @throws java.util.NoSuchElementException   if the key is not in the map
      */
     public V remove(K key) {
-
+        if (key == null) {
+            throw new IllegalArgumentException("Key can't be null");
+        }
+        int index = Math.abs(key.hashCode()) % table.length;
+        int start = index;
+        while (table[index] != null) {
+            if (!table[index].isRemoved() && table[index].getKey().equals(key)) {
+                V removedValue = table[index].getValue();
+                table[index].setRemoved(true);
+                size--;
+                return removedValue;
+            }
+            index = (index + 1) % table.length;
+            if (index == start) {
+                break;
+            }
+        }
+        throw new NoSuchElementException("Key doesn't exist");
     }
 
     /**
@@ -121,7 +170,23 @@ public class LinearProbingHashMap<K, V> {
      * @throws java.util.NoSuchElementException   if the key is not in the map
      */
     public V get(K key) {
-
+        if (key == null) {
+            throw new IllegalArgumentException("can't pass in a null key");
+        }
+        int index = Math.abs(key.hashCode()) % table.length;
+        int turns = 0;
+        while (table[index] != null && turns < size) {
+            if (table[index].getKey() != null && !table[index].isRemoved() && table[index].getKey().equals(key)) {
+                return table[index].getValue();
+            } else if (table[index].getKey() != null && table[index].isRemoved() && table[index].getKey().equals(key)) {
+                throw new NoSuchElementException("Key Not Found in Map.");
+            }
+            if (!table[index].isRemoved()) {
+                turns++;
+            }
+            index = (index + 1) % table.length;
+        }
+        throw new NoSuchElementException("Key not found in map.");
     }
 
     /**
@@ -133,7 +198,12 @@ public class LinearProbingHashMap<K, V> {
      * @throws java.lang.IllegalArgumentException if key is null
      */
     public boolean containsKey(K key) {
-
+        try {
+            this.get(key);
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -144,7 +214,13 @@ public class LinearProbingHashMap<K, V> {
      * @return the set of keys in this map
      */
     public Set<K> keySet() {
-
+        Set<K> keys = new HashSet<>();
+        for (LinearProbingMapEntry<K, V> entry : table) {
+            if (entry != null && !entry.isRemoved()) {
+                keys.add(entry.getKey());
+            }
+        }
+        return keys;
     }
 
     /**
@@ -158,7 +234,14 @@ public class LinearProbingHashMap<K, V> {
      * @return list of values in this map
      */
     public List<V> values() {
+        List<V> vals = new ArrayList<>();
+        for (LinearProbingMapEntry<K, V> entry : table) {
+            if (entry != null && !entry.isRemoved()) {
+                vals.add(entry.getValue());
+            }
+        }
 
+        return vals;
     }
 
     /**
@@ -170,7 +253,7 @@ public class LinearProbingHashMap<K, V> {
      * to the specified length.
      *
      * You should iterate over the old table in order of increasing index and
-     * add entries to the new table in the order in which they are traversed. 
+     * add entries to the new table in the order in which they are traversed.
      * You should NOT copy over removed elements to the resized backing table.
      *
      * Since resizing the backing table is working with the non-duplicate
@@ -185,7 +268,26 @@ public class LinearProbingHashMap<K, V> {
      *                                            map
      */
     public void resizeBackingTable(int length) {
-
+        if (length < 0 || length < size) {
+            throw new IllegalArgumentException("Length can't be less than number of items in the hash map");
+        }
+        LinearProbingMapEntry<K, V>[] newTable = (LinearProbingMapEntry<K, V>[]) new LinearProbingMapEntry[length];
+        int iteration = 0;
+        int index = 0;
+        while (iteration < size) {
+            if (table[index] == null || table[index].isRemoved()) {
+                index++;
+            } else if (table[index] != null && !table[index].isRemoved()) {
+                int newIndex = Math.abs(table[index].getKey().hashCode()) % length;
+                while (newTable[newIndex] != null) {
+                    newIndex++;
+                }
+                newTable[newIndex] = new LinearProbingMapEntry<>(table[index].getKey(), table[index].getValue());
+                iteration++;
+                index++;
+            }
+        }
+        table = newTable;
     }
 
     /**
@@ -197,7 +299,8 @@ public class LinearProbingHashMap<K, V> {
      * Must be O(1).
      */
     public void clear() {
-
+        table = new LinearProbingMapEntry[INITIAL_CAPACITY];
+        size = 0;
     }
 
     /**
