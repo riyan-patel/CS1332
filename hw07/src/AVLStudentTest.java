@@ -1,15 +1,20 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * These tests are not exhaustive.
+ *
  * @author CS 1332 TAs
+ * @author yash
  * @version 1.0
  */
 public class AVLStudentTest {
@@ -24,11 +29,11 @@ public class AVLStudentTest {
     @Test(timeout = TIMEOUT)
     public void testAddRightRotation() {
         /*
-                    5                   4
-                   /                   / \
-                  4         ->        3   5
-                 /
-                3
+         * 5 4
+         * / / \
+         * 4 -> 3 5
+         * /
+         * 3
          */
         avlTree.add(5);
         avlTree.add(4);
@@ -51,11 +56,11 @@ public class AVLStudentTest {
     @Test(timeout = TIMEOUT)
     public void testAddRightLeftRotationRoot() {
         /*
-                3               4
-                 \             / \
-                  5     ->    3   5
-                 /
-                4
+         * 3 4
+         * \ / \
+         * 5 -> 3 5
+         * /
+         * 4
          */
         avlTree.add(3);
         avlTree.add(5);
@@ -78,11 +83,11 @@ public class AVLStudentTest {
     @Test(timeout = TIMEOUT)
     public void testRemove() {
         /*
-                    646                     646
-                   /   \                   /   \
-                 477   856      ->       386   856
-                 / \                       \
-               386 526                      526
+         * 646 646
+         * / \ / \
+         * 477 856 -> 386 856
+         * / \ \
+         * 386 526 526
          */
         Integer toBeRemoved = new Integer(477);
         avlTree.add(646);
@@ -113,11 +118,11 @@ public class AVLStudentTest {
     @Test(timeout = TIMEOUT)
     public void testGet() {
         /*
-                        477
-                       /   \
-                     386   526
-                              \
-                              646
+         * 477
+         * / \
+         * 386 526
+         * \
+         * 646
          */
         Integer maximum = new Integer(646);
         avlTree.add(477);
@@ -131,11 +136,11 @@ public class AVLStudentTest {
     @Test(timeout = TIMEOUT)
     public void testContains() {
         /*
-                        477
-                       /   \
-                     386   526
-                              \
-                              646
+         * 477
+         * / \
+         * 386 526
+         * \
+         * 646
          */
         avlTree.add(new Integer(477));
         avlTree.add(new Integer(526));
@@ -150,16 +155,14 @@ public class AVLStudentTest {
         assertEquals(false, avlTree.contains(new Integer(500)));
     }
 
-
-
     @Test(timeout = TIMEOUT)
     public void testHeight() {
         /*
-                     646
-                    /   \
-                  477   856
-                  / \
-                386 526
+         * 646
+         * / \
+         * 477 856
+         * / \
+         * 386 526
          */
         avlTree.add(646);
         avlTree.add(386);
@@ -173,13 +176,13 @@ public class AVLStudentTest {
     @Test(timeout = TIMEOUT)
     public void testFindMedian() {
         /*
-                    76
-                 /      \
-               34        90
-              /  \
-            20    40
-
-            median: 40
+         * 76
+         * / \
+         * 34 90
+         * / \
+         * 20 40
+         *
+         * median: 40
          */
 
         avlTree.add(76);
@@ -192,13 +195,13 @@ public class AVLStudentTest {
         assertEquals(root.getLeft().getRight().getData(), avlTree.findMedian());
 
         /*
-                    76
-                 /      \
-               34        90
-              /  \      /   \
-            20    40  81    100
-
-            median: 76
+         * 76
+         * / \
+         * 34 90
+         * / \ / \
+         * 20 40 81 100
+         *
+         * median: 76
          */
         avlTree.add(81);
         avlTree.add(100);
@@ -208,10 +211,10 @@ public class AVLStudentTest {
     @Test(timeout = TIMEOUT)
     public void testConstructorAndClear() {
         /*
-                     7
-                    / \
-                   1   24
-        */
+         * 7
+         * / \
+         * 1 24
+         */
 
         List<Integer> toAdd = new ArrayList<>();
         toAdd.add(7);
@@ -223,4 +226,151 @@ public class AVLStudentTest {
         assertEquals(null, avlTree.getRoot());
         assertEquals(0, avlTree.size());
     }
+
+    @Test(timeout = TIMEOUT)
+    public void testAddDuplicate() {
+        avlTree.add(5);
+        avlTree.add(3);
+        avlTree.add(7);
+
+        int initialSize = avlTree.size();
+        avlTree.add(5); // Adding a duplicate
+
+        assertEquals(initialSize, avlTree.size());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testRemoveRoot() {
+        avlTree.add(10);
+        avlTree.add(5);
+        avlTree.add(15);
+
+        avlTree.remove(10);
+
+        assertEquals(2, avlTree.size());
+        assertEquals((Integer) 5, avlTree.getRoot().getData());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testFindMedianOdd() {
+        avlTree.add(10);
+        avlTree.add(20);
+        avlTree.add(15);
+
+        assertEquals((Integer) 15, avlTree.findMedian());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testFindMedianEven() {
+        avlTree.add(10);
+        avlTree.add(20);
+        avlTree.add(15);
+        avlTree.add(25);
+
+        try {
+            avlTree.findMedian();
+        } catch (NoSuchElementException e) {
+            return; // Expected exception
+        }
+        assert false : "Expected NoSuchElementException";
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testRemoveLeaf() {
+        avlTree.add(10);
+        avlTree.add(5);
+        avlTree.add(15);
+
+        avlTree.remove(5);
+
+        assertEquals(2, avlTree.size());
+        assertEquals((Integer) 10, avlTree.getRoot().getData());
+        assertEquals((Integer) 15, avlTree.getRoot().getRight().getData());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testClear() {
+        avlTree.add(10);
+        avlTree.add(20);
+        avlTree.add(15);
+
+        avlTree.clear();
+
+        assertEquals(0, avlTree.size());
+        assertEquals(-1, avlTree.height());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testHeightEmpty() {
+        assertEquals(-1, avlTree.height());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testAddSingleElement() {
+        avlTree.add(10);
+
+        assertEquals(1, avlTree.size());
+        assertEquals((Integer) 10, avlTree.getRoot().getData());
+        assertEquals(0, avlTree.getRoot().getHeight());
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testRemoveNodeWithTwoChildren() {
+        avlTree.add(10);
+        avlTree.add(5);
+        avlTree.add(20);
+        avlTree.add(15);
+
+        avlTree.remove(10);
+
+        assertEquals(3, avlTree.size());
+        assertEquals((Integer) 15, avlTree.getRoot().getData()); // Predecessor of 10
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testMultipleRotations() {
+        avlTree.add(10);
+        avlTree.add(5);
+        avlTree.add(6);
+        avlTree.add(4);
+        avlTree.add(2);
+        avlTree.add(0);
+
+        /*
+         *     4
+         *    /  \
+         *   1    6
+         *  /    / \
+         * 0    5  10
+         */
+
+        assertEquals(6, avlTree.size());
+        assertEquals((Integer) 4, avlTree.getRoot().getData()); // Root after rotations
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testAddNull() {
+        try {
+            avlTree.add(null);
+        } catch (IllegalArgumentException e) {
+            return; // Expected exception
+        }
+        assert false : "Expected IllegalArgumentException";
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testSizeAfterAddRemove() {
+        avlTree.add(10);
+        avlTree.add(20);
+        avlTree.add(5);
+
+        assertEquals(3, avlTree.size());
+
+        avlTree.remove(5);
+        assertEquals(2, avlTree.size());
+
+        avlTree.add(15);
+        assertEquals(3, avlTree.size());
+    }
+
 }
