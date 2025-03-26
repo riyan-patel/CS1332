@@ -1,24 +1,25 @@
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
 
 /**
  * Your implementation of various sorting algorithms.
  *
- * @author YOUR NAME HERE
+ * @author Riyan Patel
  * @version 1.0
- * @userid YOUR USER ID HERE (i.e. gburdell3)
- * @GTID YOUR GT ID HERE (i.e. 900000000)
+ * @userid rpatel816
+ * @GTID 903978548
  *
  * Collaborators: LIST ALL COLLABORATORS YOU WORKED WITH HERE
- *
+ * NA
  * Resources: LIST ALL NON-COURSE RESOURCES YOU CONSULTED HERE
- * 
+ * NA
  * By typing 'I agree' below, you are agreeing that this is your
  * own work and that you are responsible for all the contents of 
  * this file. If this is left blank, this homework will receive a zero.
  * 
- * Agree Here: REPLACE THIS TEXT
+ * Agree Here: I agree
  */
 public class Sorting {
 
@@ -43,6 +44,18 @@ public class Sorting {
      *                                            null
      */
     public static <T> void insertionSort(T[] arr, Comparator<T> comparator) {
+        if (arr == null || comparator == null) {
+            throw new IllegalArgumentException("arr or comparator can't be null");
+        }
+
+        for (int i = 1; i < arr.length; i++) {
+            int j = i - 1;
+            T temp = arr[i];
+            while (j >= 0 && comparator.compare(arr[j], temp) > 0) {
+                arr[j + 1] = arr[j--];
+            }
+            arr[j + 1] = temp;
+        }
     }
 
     /**
@@ -69,7 +82,44 @@ public class Sorting {
      *                                            null
      */
     public static <T> void cocktailSort(T[] arr, Comparator<T> comparator) {
+        boolean swapsMade = true;
+        int startIndex = 0;
+        int endIndex = arr.length - 1;
+        while (swapsMade) {
+            swapsMade = false;
+            int lastSwapped = startIndex;
+            for(int i = startIndex; i < endIndex; i++) {
+                if (comparator.compare(arr[i], arr[i + 1]) > 0) {
+                    swap(arr, i, i + 1);
+                    swapsMade = true;
+                    lastSwapped = i;
+                }
+            }
 
+            endIndex = lastSwapped;
+
+
+            if (swapsMade) {
+
+                swapsMade = false;
+                lastSwapped = endIndex;
+                for (int i = endIndex; i > startIndex; i--) {
+                    if (comparator.compare(arr[i - 1], arr[i]) > 0) {
+                        swap(arr, i - 1, i);
+                        swapsMade = true;
+                        lastSwapped = i;
+                    }
+                }
+                startIndex = lastSwapped;
+            }
+        }
+
+    }
+
+    private static <T> void swap(T[] arr, int a, int b) {
+        T temp = arr[a];
+        arr[a] = arr[b];
+        arr[b] = temp;
     }
 
     /**
@@ -151,7 +201,7 @@ public class Sorting {
      */
     public static <T> T kthSelect(int k, T[] arr, Comparator<T> comparator,
                                   Random rand) {
-
+        return null;
     }
 
     /**
@@ -230,6 +280,6 @@ public class Sorting {
      * @throws java.lang.IllegalArgumentException if the data is null
      */
     public static int[] heapSort(List<Integer> data) {
-
+        return null;
     }
 }
