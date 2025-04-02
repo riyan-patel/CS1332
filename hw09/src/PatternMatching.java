@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class PatternMatching {
     public static List<Integer> boyerMoore(CharSequence pattern,
                                            CharSequence text,
                                            CharacterComparator comparator) {
-
+        return null;
     }
 
     /**
@@ -72,7 +73,15 @@ public class PatternMatching {
      * @throws java.lang.IllegalArgumentException if the pattern is null
      */
     public static Map<Character, Integer> buildLastTable(CharSequence pattern) {
-
+        if (pattern == null) {
+            throw new IllegalArgumentException("pattern can't be null");
+        }
+        Map<Character, Integer> lastTable = new HashMap<>();
+        for (int i = 0; i < pattern.length(); i++) {
+            char c = pattern.charAt(i);
+            lastTable.put(c, i);
+        }
+        return lastTable;
     }
 
     /**
@@ -92,7 +101,7 @@ public class PatternMatching {
      */
     public static List<Integer> kmp(CharSequence pattern, CharSequence text,
                                     CharacterComparator comparator) {
-
+        return null;
     }
 
     /**
@@ -125,7 +134,7 @@ public class PatternMatching {
      */
     public static int[] buildFailureTable(CharSequence pattern,
                                           CharacterComparator comparator) {
-
+        return null;
     }
 
     /**
@@ -194,7 +203,7 @@ public class PatternMatching {
     public static List<Integer> rabinKarp(CharSequence pattern,
                                           CharSequence text,
                                           CharacterComparator comparator) {
-
+        return null;
     }
 
     /**
