@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,34 @@ public class PatternMatching {
     public static List<Integer> boyerMoore(CharSequence pattern,
                                            CharSequence text,
                                            CharacterComparator comparator) {
-        return null;
+        if (pattern == null || pattern.length() == 0) {
+            throw new IllegalArgumentException("pattern can't be null or have length 0");
+        }
+        if (text == null || comparator == null) {
+            throw new IllegalArgumentException("text and comparator can't be null");
+        }
+        List<Integer> result = new ArrayList<>();
+        Map<Character, Integer> lastTable = buildLastTable(pattern);
+        int patternLength = pattern.length();
+        int textLength = text.length();
+        int i = 0;
+        while (i <= (textLength - patternLength)) {
+            int j = patternLength - 1;
+            while ((j >= 0) && (comparator.compare(text.charAt(i + j), pattern.charAt(j)) == 0)) {
+                j--;
+            }
+            if (j == -1) {
+                result.add(i);
+                i = i + 1;
+            }
+            else {
+                char misMatchedChar = text.charAt(i + j);
+                int shiftIndex = lastTable.getOrDefault(misMatchedChar, -1);
+                int shift = Math.max(1, j - shiftIndex);
+                i = i + shift;
+            }
+        }
+        return result;
     }
 
     /**
