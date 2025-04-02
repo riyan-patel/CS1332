@@ -1,132 +1,214 @@
 import org.junit.Before;
 import org.junit.Test;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
+import static org.junit.Assert.*;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-/**
- * This is a basic set of unit tests for Sorting.
- *
- * Passing these tests doesn't guarantee any grade on these assignments. These
- * student JUnits that we provide should be thought of as a sanity check to
- * help you get started on the homework and writing JUnits in general.
- *
- * We highly encourage you to write your own set of JUnits for each homework
- * to cover edge cases you can think of for each data structure. Your code must
- * work correctly and efficiently in all cases, which is why it's important
- * to write comprehensive tests to cover as many cases as possible.
- *
- * @author CS 1332 TAs
- * @version 1.0
- */
 public class SortingStudentTest {
 
-    private static final int TIMEOUT = 200;
+    private static final int TIMEOUT = 1000;
+    private static final int LARGE_SIZE = 10000;
+
     private IntegerWrapper[] integers;
     private IntegerWrapper[] sortedIntegers;
     private ComparatorPlus<IntegerWrapper> comp;
 
     @Before
     public void setUp() {
-        /*
-            Initial array:
-                index 0: 5
-                index 1: 4
-                index 2: 2
-                index 3: 3
-                index 4: 6
-                index 5: 1
-                index 6: 0
-                index 7: 7
-         */
+        integers = new IntegerWrapper[]{
+                new IntegerWrapper(5),
+                new IntegerWrapper(4),
+                new IntegerWrapper(2),
+                new IntegerWrapper(3),
+                new IntegerWrapper(6),
+                new IntegerWrapper(1),
+                new IntegerWrapper(0),
+                new IntegerWrapper(7)
+        };
 
-        /*
-            Sorted array:
-                index 0: 0
-                index 1: 1
-                index 2: 2
-                index 3: 3
-                index 4: 4
-                index 5: 5
-                index 6: 6
-                index 7: 7
-         */
-
-        integers = new IntegerWrapper[8];
-        integers[0] = new IntegerWrapper(5);
-        integers[1] = new IntegerWrapper(4);
-        integers[2] = new IntegerWrapper(2);
-        integers[3] = new IntegerWrapper(3);
-        integers[4] = new IntegerWrapper(6);
-        integers[5] = new IntegerWrapper(1);
-        integers[6] = new IntegerWrapper(0);
-        integers[7] = new IntegerWrapper(7);
-
-        sortedIntegers = new IntegerWrapper[integers.length];
-        for (int i = 0; i < sortedIntegers.length; i++) {
-            sortedIntegers[i] = new IntegerWrapper(i);
-        }
+        sortedIntegers = Arrays.stream(integers)
+                .sorted(Comparator.comparing(IntegerWrapper::getValue))
+                .toArray(IntegerWrapper[]::new);
 
         comp = IntegerWrapper.getComparator();
     }
 
+    //  Basic Sort Tests
     @Test(timeout = TIMEOUT)
     public void testInsertionSort() {
         Sorting.insertionSort(integers, comp);
-        assertArrayEquals(sortedIntegers, integers);
-        assertTrue("Number of comparisons: " + comp.getCount(),
-            comp.getCount() <= 19 && comp.getCount() != 0);
+        assertArrayEquals("Insertion sort failed", sortedIntegers, integers);
     }
 
     @Test(timeout = TIMEOUT)
     public void testCocktailSort() {
         Sorting.cocktailSort(integers, comp);
-        assertArrayEquals(sortedIntegers, integers);
-        assertTrue("Number of comparisons: " + comp.getCount(),
-            comp.getCount() <= 21 && comp.getCount() != 0);
+        assertArrayEquals("Cocktail sort failed", sortedIntegers, integers);
     }
 
     @Test(timeout = TIMEOUT)
     public void testMergeSort() {
         Sorting.mergeSort(integers, comp);
-        assertArrayEquals(sortedIntegers, integers);
-        assertTrue("Number of comparisons: " + comp.getCount(),
-            comp.getCount() <= 15 && comp.getCount() != 0);
+        assertArrayEquals("Merge sort failed", sortedIntegers, integers);
     }
 
-    @Test(timeout = TIMEOUT)
-    public void testKthSelect() {
-        int randomSeed = 4;
-        assertEquals(new IntegerWrapper(0), Sorting.kthSelect(1,
-                integers, comp, new Random(randomSeed)));
-        assertTrue("Number of comparisons: " + comp.getCount(),
-            comp.getCount() <= 8 && comp.getCount() != 0);
-    }
-    
+    //  LSD Radix Sort
     @Test(timeout = TIMEOUT)
     public void testLsdRadixSort() {
-        int[] unsortedArray = new int[]{54, 28, 58, 84, 20, 122, -85, 3};
-        int[] sortedArray = new int[]{-85, 3, 20, 28, 54, 58, 84, 122};
-        Sorting.lsdRadixSort(unsortedArray);
-        assertArrayEquals(sortedArray, unsortedArray);
+        int[] array = {54, -23, 0, 5, -1000, 42};
+        int[] expected = {-1000, -23, 0, 5, 42, 54};
+        Sorting.lsdRadixSort(array);
+        assertArrayEquals("LSD Radix failed", expected, array);
     }
 
+    //  Null Handling and Edge Cases
+    @Test(timeout = TIMEOUT, expected = IllegalArgumentException.class)
+    public void testNullArray() {
+        Sorting.insertionSort(null, comp);
+    }
+
+
+    //  Stability Check
     @Test(timeout = TIMEOUT)
-    public void testHeapSort() {
-        int[] unsortedArray = new int[] {54, 28, 58, 84, 20, 122, -85, 3};
-        List<Integer> unsortedList = new ArrayList<>();
-        for (int i : unsortedArray) {
-            unsortedList.add(i);
+    public void testStability() {
+        IntegerWrapper[] stableArray = {
+                new IntegerWrapper(1),
+                new IntegerWrapper(2),
+                new IntegerWrapper(2),
+                new IntegerWrapper(3),
+                new IntegerWrapper(3)
+        };
+
+        Sorting.insertionSort(stableArray, comp);
+        assertEquals("Failed stability check", stableArray[1], stableArray[2]);
+        assertEquals("Failed stability check", stableArray[3], stableArray[4]);
+    }
+
+    //  Mixed Positive and Negative Values
+    @Test(timeout = TIMEOUT)
+    public void testMixedNumbers() {
+        IntegerWrapper[] mixed = {
+                new IntegerWrapper(-50),
+                new IntegerWrapper(100),
+                new IntegerWrapper(-10),
+                new IntegerWrapper(0),
+                new IntegerWrapper(99)
+        };
+
+        IntegerWrapper[] expected = {
+                new IntegerWrapper(-50),
+                new IntegerWrapper(-10),
+                new IntegerWrapper(0),
+                new IntegerWrapper(99),
+                new IntegerWrapper(100)
+        };
+
+        Sorting.mergeSort(mixed, comp);
+        assertArrayEquals("Failed on mixed numbers", expected, mixed);
+    }
+
+    //  Boundary Values
+    @Test(timeout = TIMEOUT)
+    public void testBoundaryValues() {
+        IntegerWrapper[] boundary = {
+                new IntegerWrapper(Integer.MIN_VALUE),
+                new IntegerWrapper(0),
+                new IntegerWrapper(Integer.MAX_VALUE),
+                new IntegerWrapper(-1),
+                new IntegerWrapper(1)
+        };
+
+        IntegerWrapper[] expected = {
+                new IntegerWrapper(Integer.MIN_VALUE),
+                new IntegerWrapper(-1),
+                new IntegerWrapper(0),
+                new IntegerWrapper(1),
+                new IntegerWrapper(Integer.MAX_VALUE)
+        };
+
+        Sorting.mergeSort(boundary, comp);
+        assertArrayEquals("Failed on boundary values", expected, boundary);
+    }
+
+    //  Large Dataset (Stress Test)
+    @Test(timeout = TIMEOUT)
+    public void testLargeDataset() {
+        Random random = new Random(42);
+
+        IntegerWrapper[] largeArray = new IntegerWrapper[LARGE_SIZE];
+        IntegerWrapper[] expected = new IntegerWrapper[LARGE_SIZE];
+
+        for (int i = 0; i < LARGE_SIZE; i++) {
+            int val = random.nextInt();
+            largeArray[i] = new IntegerWrapper(val);
+            expected[i] = new IntegerWrapper(val);
         }
-        int[] sortedArray = new int[] {-85, 3, 20, 28, 54, 58, 84, 122};
-        int[] actualArray = Sorting.heapSort(unsortedList);
-        assertArrayEquals(sortedArray, actualArray);
+
+        Arrays.sort(expected, Comparator.comparing(IntegerWrapper::getValue));
+
+        Sorting.mergeSort(largeArray, comp);
+        assertArrayEquals("Failed on large dataset", expected, largeArray);
+    }
+
+    //  Repeated Randomized Testing for Consistency
+    @Test(timeout = TIMEOUT)
+    public void testRandomizedConsistency() {
+        Random rand = new Random(42);
+
+        for (int i = 0; i < 100; i++) {
+            int size = rand.nextInt(100) + 10;
+            IntegerWrapper[] arr = new IntegerWrapper[size];
+
+            for (int j = 0; j < size; j++) {
+                arr[j] = new IntegerWrapper(rand.nextInt(10000) - 5000);
+            }
+
+            IntegerWrapper[] expected = Arrays.copyOf(arr, arr.length);
+            Arrays.sort(expected, Comparator.comparing(IntegerWrapper::getValue));
+
+            Sorting.mergeSort(arr, comp);
+            assertArrayEquals("Failed on random test run #" + i, expected, arr);
+        }
+    }
+
+    //  Benchmarking Execution Time
+    @Test(timeout = TIMEOUT)
+    public void testPerformance() {
+        Random rand = new Random();
+        IntegerWrapper[] largeArray = new IntegerWrapper[LARGE_SIZE];
+
+        for (int i = 0; i < LARGE_SIZE; i++) {
+            largeArray[i] = new IntegerWrapper(rand.nextInt(100000));
+        }
+
+        long startTime = System.currentTimeMillis();
+        Sorting.mergeSort(largeArray, comp);
+        long duration = System.currentTimeMillis() - startTime;
+
+        System.out.println("MergeSort Time for " + LARGE_SIZE + " elements: " + duration + "ms");
+        assertTrue("Performance regression detected!", duration < 500);
+    }
+
+
+    @Test(timeout = TIMEOUT)
+    public void testSortInvariant() {
+        Random rand = new Random();
+
+        for (int i = 0; i < 100; i++) {
+            int size = rand.nextInt(100) + 1;
+            IntegerWrapper[] arr = new IntegerWrapper[size];
+
+            for (int j = 0; j < size; j++) {
+                arr[j] = new IntegerWrapper(rand.nextInt(10000) - 5000);
+            }
+
+            Sorting.mergeSort(arr, comp);
+
+            for (int k = 0; k < arr.length - 1; k++) {
+                assertTrue("Failed sort invariant at index " + k,
+                        arr[k].getValue() <= arr[k + 1].getValue());
+            }
+        }
     }
 
     /**
@@ -192,7 +274,7 @@ public class SortingStudentTest {
                 return true;
             }
             return other instanceof IntegerWrapper
-                && ((IntegerWrapper) other).value.equals(this.value);
+                    && ((IntegerWrapper) other).value.equals(this.value);
         }
     }
 

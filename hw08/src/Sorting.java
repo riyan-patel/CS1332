@@ -1,6 +1,7 @@
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.PriorityQueue;
 import java.util.Random;
 
 /**
@@ -16,9 +17,9 @@ import java.util.Random;
  * Resources: LIST ALL NON-COURSE RESOURCES YOU CONSULTED HERE
  * NA
  * By typing 'I agree' below, you are agreeing that this is your
- * own work and that you are responsible for all the contents of 
+ * own work and that you are responsible for all the contents of
  * this file. If this is left blank, this homework will receive a zero.
- * 
+ *
  * Agree Here: I agree
  */
 public class Sorting {
@@ -88,17 +89,14 @@ public class Sorting {
         while (swapsMade) {
             swapsMade = false;
             int lastSwapped = startIndex;
-            for(int i = startIndex; i < endIndex; i++) {
+            for (int i = startIndex; i < endIndex; i++) {
                 if (comparator.compare(arr[i], arr[i + 1]) > 0) {
                     swap(arr, i, i + 1);
                     swapsMade = true;
                     lastSwapped = i;
                 }
             }
-
             endIndex = lastSwapped;
-
-
             if (swapsMade) {
 
                 swapsMade = false;
@@ -113,9 +111,15 @@ public class Sorting {
                 startIndex = lastSwapped;
             }
         }
-
     }
-
+    /**
+     * Swap two elements in an array
+     *
+     * @param arr the array that contains items to swap
+     * @param a first item
+     * @param b second item
+     * @param <T>  data type to sort
+     */
     private static <T> void swap(T[] arr, int a, int b) {
         T temp = arr[a];
         arr[a] = arr[b];
@@ -152,7 +156,46 @@ public class Sorting {
      *                                            null
      */
     public static <T> void mergeSort(T[] arr, Comparator<T> comparator) {
+        if (arr == null && comparator == null) {
+            throw new IllegalArgumentException("arr and comparator can't be null");
+        }
+        if (arr.length > 1) {
+            int len = arr.length;
+            int midIndex = len / 2;
+            T[] left = (T[]) new Object[midIndex];
+            T[] right = (T[]) new Object[len - midIndex];
 
+            for (int i = 0; i < left.length; i++) {
+                left[i] = arr[i];
+            }
+            for (int i = 0; i < right.length; i++) {
+                right[i] = arr[i + left.length];
+            }
+            mergeSort(left, comparator);
+            mergeSort(right, comparator);
+            merge(arr, comparator, left, right);
+        }
+    }
+    /**
+     * Merges separated arrays
+     *
+     * @param arr the array to be sorted
+     * @param comparator comparator used to compare values
+     * @param left left array
+     * @param right right Array
+     * @param <T> data type to sort
+     */
+    private static <T> void merge(T[] arr, Comparator<T> comparator, T[] left, T[] right) {
+        int i = 0;
+        int j = 0;
+        for (int k = 0; k < arr.length; k++) {
+            if (j >= right.length || (i < left.length
+                    && comparator.compare(left[i], right[j]) <= 0)) {
+                arr[k] = left[i++];
+            } else {
+                arr[k] = right[j++];
+            }
+        }
     }
 
     /**
@@ -201,7 +244,69 @@ public class Sorting {
      */
     public static <T> T kthSelect(int k, T[] arr, Comparator<T> comparator,
                                   Random rand) {
-        return null;
+        if (arr == null || comparator == null || rand == null || k < 1 || k > arr.length) {
+            throw new IllegalArgumentException("Invalid arguments.");
+        }
+
+        return quickSortStyleSelect(arr, 0, arr.length - 1, k - 1, comparator, rand);
+    }
+    /**
+     * Helper method for kthSelect using Quickselect algorithm.
+     *
+     * Selects the kth smallest element in the array using randomized pivoting.
+     *
+     * @param <T>        data type to sort
+     * @param arr        the array to search within
+     * @param left       the starting index of the search range
+     * @param right      the ending index of the search range
+     * @param k          the index (0-based) of the desired smallest element
+     * @param comparator the Comparator used to compare the data in arr
+     * @param rand       the Random object used to select pivots
+     * @return the kth smallest element in the array
+     */
+    private static <T> T quickSortStyleSelect(T[] arr, int left, int right,
+                                              int k, Comparator<T> comparator, Random rand) {
+        while (left <= right) {
+            int pivotIndex = rand.nextInt(right - left + 1) + left;
+            int pivotFinalIndex = partition(arr, left, right, pivotIndex, comparator);
+
+            if (pivotFinalIndex == k) {
+                return arr[pivotFinalIndex];
+            } else if (k < pivotFinalIndex) {
+                right = pivotFinalIndex - 1;
+            } else {
+                left = pivotFinalIndex + 1;
+            }
+        }
+
+        throw new RuntimeException("kthSelect failed unexpectedly.");
+    }
+
+    /**
+     * Partitions the array around a pivot such that elements less than the pivot
+     * are on the left, and elements greater than or equal to the pivot are on the right.
+     *
+     * @param <T>         data type to sort
+     * @param arr         the array to partition
+     * @param left        the starting index of the partition range
+     * @param right       the ending index of the partition range
+     * @param pivotIndex  the index of the pivot element
+     * @param comparator  the Comparator used to compare the data in arr
+     * @return the final index of the pivot after partitioning
+     */
+    private static <T> int partition(T[] arr, int left, int right, int pivotIndex, Comparator<T> comparator) {
+        T pivot = arr[pivotIndex];
+        swap(arr, pivotIndex, right);
+        int storeIndex = left;
+
+        for (int i = left; i < right; i++) {
+            if (comparator.compare(arr[i], pivot) < 0) {
+                swap(arr, i, storeIndex++);
+            }
+        }
+
+        swap(arr, storeIndex, right);
+        return storeIndex;
     }
 
     /**
@@ -247,7 +352,47 @@ public class Sorting {
      * @throws java.lang.IllegalArgumentException if the array is null
      */
     public static void lsdRadixSort(int[] arr) {
+        if (arr == null) {
+            throw new IllegalArgumentException("Array cannot be null");
+        }
 
+        int max = 0;
+        for (int element : arr) {
+            int absVal = Math.abs(element);
+            if (absVal > max) {
+                max = absVal;
+            }
+        }
+
+        int k = 0;
+        int temp = max;
+        while (temp > 0) {
+            temp /= 10;
+            k++;
+        }
+
+        int base = 1;
+
+        for (int i = 0; i < k; i++) {
+            List<List<Integer>> buckets = new ArrayList<>();
+            for (int b = 0; b < 19; b++) {
+                buckets.add(new ArrayList<>());
+            }
+
+            for (int num : arr) {
+                int b = (num / base % 10) + 9;
+                buckets.get(b).add(num);
+            }
+
+            int index = 0;
+            for (List<Integer> bucket : buckets) {
+                for (int num : bucket) {
+                    arr[index++] = num;
+                }
+            }
+
+            base *= 10;
+        }
     }
 
     /**
@@ -280,6 +425,18 @@ public class Sorting {
      * @throws java.lang.IllegalArgumentException if the data is null
      */
     public static int[] heapSort(List<Integer> data) {
-        return null;
+        if (data == null) {
+            throw new IllegalArgumentException("data can't be null");
+        }
+        PriorityQueue<Integer> heap = new PriorityQueue<>(data);
+
+        int[] resultArr = new int[data.size()];
+
+        int index = 0;
+        while (!heap.isEmpty()) {
+            resultArr[index++] = heap.poll();
+        }
+
+        return resultArr;
     }
 }
