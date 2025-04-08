@@ -6,10 +6,10 @@ import java.util.Map;
 /**
  * Your implementations of various string searching algorithms.
  *
- * @author YOUR NAME HERE
+ * @author Riyan Patel
  * @version 1.0
- * @userid YOUR USER ID HERE (i.e. gburdell3)
- * @GTID YOUR GT ID HERE (i.e. 900000000)
+ * @userid rpatel816
+ * @GTID 903978548
  *
  * Collaborators: LIST ALL COLLABORATORS YOU WORKED WITH HERE
  *
@@ -19,7 +19,7 @@ import java.util.Map;
  * own work and that you are responsible for all the contents of 
  * this file. If this is left blank, this homework will receive a zero.
  * 
- * Agree Here: REPLACE THIS TEXT
+ * Agree Here: i agree
  */
 public class PatternMatching {
 
@@ -63,8 +63,7 @@ public class PatternMatching {
             if (j == -1) {
                 result.add(i);
                 i = i + 1;
-            }
-            else {
+            } else {
                 char misMatchedChar = text.charAt(i + j);
                 int shiftIndex = lastTable.getOrDefault(misMatchedChar, -1);
                 int shift = Math.max(1, j - shiftIndex);
@@ -129,7 +128,40 @@ public class PatternMatching {
      */
     public static List<Integer> kmp(CharSequence pattern, CharSequence text,
                                     CharacterComparator comparator) {
-        return null;
+        if (pattern == null || pattern.length() == 0) {
+            throw new IllegalArgumentException("pattern can't be null or empty");
+        }
+
+        if (text == null || comparator == null) {
+            throw new IllegalArgumentException("text or comparator can't be null");
+        }
+
+        List<Integer> resultList = new ArrayList<>();
+        if (pattern.length() > text.length()) {
+            return resultList;
+        }
+
+        int[] failureTable = buildFailureTable(pattern, comparator);
+
+        int patternIndex = 0;
+        int textIndex = 0;
+
+        while (textIndex + pattern.length() <= text.length()) {
+            while (patternIndex < pattern.length()
+                    && comparator.compare(pattern.charAt(patternIndex), text.charAt(textIndex + patternIndex)) == 0) {
+                patternIndex++;
+            }
+            if (patternIndex == 0) {
+                textIndex++;
+            } else {
+                if (patternIndex == pattern.length()) {
+                    resultList.add(textIndex);
+                }
+                textIndex += patternIndex - failureTable[patternIndex - 1];
+                patternIndex = failureTable[patternIndex - 1];
+            }
+        }
+        return resultList;
     }
 
     /**
@@ -162,7 +194,30 @@ public class PatternMatching {
      */
     public static int[] buildFailureTable(CharSequence pattern,
                                           CharacterComparator comparator) {
-        return null;
+        if (pattern == null || comparator == null) {
+            throw new IllegalArgumentException("pattern or comaprator can't be null");
+        }
+        int[] table = new int[pattern.length()];
+
+        if (pattern.length() != 0) {
+            table[0] = 0;
+        }
+
+        int prefix = 0;
+        int current = 1;
+
+        while (current < pattern.length()) {
+            if (comparator.compare(pattern.charAt(current), pattern.charAt(prefix)) == 0) {
+                table[current++] = ++prefix;
+            } else {
+                if (prefix != 0) {
+                    prefix = table[prefix - 1];
+                } else {
+                    table[current++] = prefix;
+                }
+            }
+        }
+        return table;
     }
 
     /**
@@ -231,8 +286,84 @@ public class PatternMatching {
     public static List<Integer> rabinKarp(CharSequence pattern,
                                           CharSequence text,
                                           CharacterComparator comparator) {
-        return null;
+        if (pattern == null || pattern.length() == 0) {
+            throw new IllegalArgumentException("pattern can't be null or empty");
+        }
+        if (text == null || comparator == null) {
+            throw new IllegalArgumentException("text or comparator can't be null");
+        }
+
+        List<Integer> result = new ArrayList<>();
+
+        if (pattern.length() > text.length()) {
+            return result;
+        }
+        int patternHash = hash(pattern);
+        int windowHash = hash(text.subSequence(0, pattern.length()));
+
+        if (patternHash == windowHash && check(pattern,
+                text.subSequence(0, pattern.length()), comparator)) {
+            result.add(0);
+        }
+        for (int i = 1; i < text.length() - pattern.length() + 1; i++) {
+            windowHash = (windowHash - (text.charAt(i - 1)
+                    * power(BASE, pattern.length() - 1)))
+                    * BASE + text.charAt(i + pattern.length() - 1);
+            if (windowHash == patternHash && check(pattern,
+                    text.subSequence(i, i + pattern.length()), comparator)) {
+                result.add(i);
+            }
+        }
+        return result;
     }
+
+    /**
+     * helps the rabinKarp method to calulate the hash
+     *
+     * @param text string that needs to be calculated
+     * @return hash value of a string passed
+     */
+    private static int hash(CharSequence text) {
+        int temp = 0;
+        for (int i = 0; i < text.length(); i++) {
+            temp += text.charAt(i) * power(BASE, text.length() - 1 - i);
+        }
+        return temp;
+    }
+
+    /**
+     * Alternative options of Math.pow()
+     *
+     * @param a number that will get multiplied
+     * @param b times that 'a' gets multiplied
+     * @return resulting value of a^b
+     */
+    private static int power(int a, int b) {
+        if (b == 0) {
+            return 1;
+        } else {
+            return a * power(a, b - 1);
+        }
+    }
+
+    /**
+     *  helps the rabinKarp method and checks if text and pattern matches
+     *
+     * @param pattern a string being searched for in a text
+     * @param text the body of text to search for pattern
+     * @param comparator the comparator to use when checking character equality
+     * @return boolean if pattern and text matches
+     */
+    private static boolean check(CharSequence pattern, CharSequence text,
+                                 CharacterComparator comparator) {
+        for (int i = 0; i < pattern.length(); i++) {
+            if (comparator.compare(pattern.charAt(i), text.charAt(i)) != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     /**
      * This method is OPTIONAL and for extra credit only.
@@ -254,6 +385,52 @@ public class PatternMatching {
     public static List<Integer> boyerMooreGalilRule(CharSequence pattern,
                                           CharSequence text,
                                           CharacterComparator comparator) {
-        return null; // if you are not implementing this method, do NOT modify this line
+        if (pattern == null || pattern.length() == 0) {
+            throw new IllegalArgumentException("pattern can't be null or empty");
+        }
+        if (text == null || comparator == null) {
+            throw new IllegalArgumentException("text or comparator can't be null");
+        }
+        List<Integer> result = new ArrayList<>();
+
+        if (pattern.length() > text.length()) {
+            return result;
+        }
+
+        Map<Character, Integer> lastTable = buildLastTable(pattern);
+        int[] failureTable = buildFailureTable(pattern, comparator);
+
+        int patternLength = pattern.length();
+        int textLength = text.length();
+        int shift = 0;
+        int galilSkip = 0;
+
+        while (shift <= textLength - patternLength) {
+            int patternIndex = patternLength - 1;
+
+            while (patternIndex >= galilSkip
+                    && comparator.compare(pattern.charAt(patternIndex),
+                    text.charAt(shift + patternIndex)) == 0) {
+                patternIndex--;
+            }
+
+            if (patternIndex < galilSkip) {
+                result.add(shift);
+
+                int skipLength = failureTable[patternLength - 1];
+                galilSkip = skipLength;
+                shift += patternLength - skipLength;
+            } else {
+                char mismatchedChar = text.charAt(shift + patternIndex);
+                int lastOccurrence = lastTable.getOrDefault(mismatchedChar, -1);
+                int shiftAmount = Math.max(1, patternIndex - lastOccurrence);
+
+                shift += shiftAmount;
+                galilSkip = 0;
+            }
+        }
+
+        return result;
+
     }
 }

@@ -1,218 +1,666 @@
 import org.junit.Before;
 import org.junit.Test;
-import java.util.*;
 
-import static org.junit.Assert.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Random;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * This is a basic set of unit tests for SortingCopy.
+ *
+ * Passing these tests doesn't guarantee any grade on these assignments. These
+ * student JUnits that we provide should be thought of as a sanity check to
+ * help you get started on the homework and writing JUnits in general.
+ *
+ * We highly encourage you to write your own set of JUnits for each homework
+ * to cover edge cases you can think of for each data structure. Your code must
+ * work correctly and efficiently in all cases, which is why it's important
+ * to write comprehensive tests to cover as many cases as possible.
+ *
+ * @author CS 1332 TAs, Thinh Nguyen
+ * @version 1.0
+ */
 public class SortingStudentTest {
 
-    private static final int TIMEOUT = 1000;
-    private static final int LARGE_SIZE = 10000;
-
+    private static final int TIMEOUT = 200;
     private IntegerWrapper[] integers;
     private IntegerWrapper[] sortedIntegers;
     private ComparatorPlus<IntegerWrapper> comp;
 
     @Before
     public void setUp() {
-        integers = new IntegerWrapper[]{
-                new IntegerWrapper(5),
-                new IntegerWrapper(4),
-                new IntegerWrapper(2),
-                new IntegerWrapper(3),
-                new IntegerWrapper(6),
-                new IntegerWrapper(1),
-                new IntegerWrapper(0),
-                new IntegerWrapper(7)
-        };
+        /*
+            Initial array:
+                index 0: 5
+                index 1: 4
+                index 2: 2
+                index 3: 3
+                index 4: 6
+                index 5: 1
+                index 6: 0
+                index 7: 7
+         */
 
-        sortedIntegers = Arrays.stream(integers)
-                .sorted(Comparator.comparing(IntegerWrapper::getValue))
-                .toArray(IntegerWrapper[]::new);
+        /*
+            Sorted array:
+                index 0: 0
+                index 1: 1
+                index 2: 2
+                index 3: 3
+                index 4: 4
+                index 5: 5
+                index 6: 6
+                index 7: 7
+         */
+
+        integers = new IntegerWrapper[8];
+        integers[0] = new IntegerWrapper(5);
+        integers[1] = new IntegerWrapper(4);
+        integers[2] = new IntegerWrapper(2);
+        integers[3] = new IntegerWrapper(3);
+        integers[4] = new IntegerWrapper(6);
+        integers[5] = new IntegerWrapper(1);
+        integers[6] = new IntegerWrapper(0);
+        integers[7] = new IntegerWrapper(7);
+
+        sortedIntegers = new IntegerWrapper[integers.length];
+        for (int i = 0; i < sortedIntegers.length; i++) {
+            sortedIntegers[i] = new IntegerWrapper(i);
+        }
 
         comp = IntegerWrapper.getComparator();
     }
 
-    //  Basic Sort Tests
     @Test(timeout = TIMEOUT)
     public void testInsertionSort() {
-        Sorting.insertionSort(integers, comp);
-        assertArrayEquals("Insertion sort failed", sortedIntegers, integers);
+        SortingCopy.insertionSort(integers, comp);
+        assertArrayEquals(sortedIntegers, integers);
+        assertTrue("Number of comparisons: " + comp.getCount(),
+                comp.getCount() <= 19 && comp.getCount() != 0);
     }
 
     @Test(timeout = TIMEOUT)
-    public void testCocktailSort() {
-        Sorting.cocktailSort(integers, comp);
-        assertArrayEquals("Cocktail sort failed", sortedIntegers, integers);
+    public void testInsertionSortWithEmpty() {
+        IntegerWrapper[] emptyTest = new IntegerWrapper[0];
+        IntegerWrapper[] emptySorted = new IntegerWrapper[0];
+        SortingCopy.insertionSort(emptyTest, comp);
+        assertArrayEquals(emptySorted, emptyTest);
+        assertTrue("Number of comparisons :" + comp.getCount(), comp.getCount() == 0);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testInsertionSortWithOne() {
+        IntegerWrapper[] oneTest = new IntegerWrapper[1];
+        IntegerWrapper[] oneSorted = new IntegerWrapper[1];
+        oneTest[0] = new IntegerWrapper(5);
+        oneSorted[0] = new IntegerWrapper(5);
+        SortingCopy.insertionSort(oneTest, comp);
+        assertArrayEquals(oneSorted, oneTest);
+        assertTrue("Number of comparisons :" + comp.getCount(), comp.getCount() == 0);
+    }
+
+
+    @Test(timeout = TIMEOUT)
+    public void testInsertionSortWithDuplicates() {
+        IntegerWrapper[] duplicateTest = new IntegerWrapper[3];
+        IntegerWrapper[] duplicateSorted = new IntegerWrapper[3];
+        IntegerWrapper element = new IntegerWrapper(5);
+        duplicateTest[0] = element;
+        duplicateTest[1] = element;
+        duplicateTest[2] = element;
+
+        duplicateSorted[0] = element;
+        duplicateSorted[1] = element;
+        duplicateSorted[2] = element;
+
+        SortingCopy.insertionSort(duplicateTest, comp);
+        assertArrayEquals(duplicateSorted, duplicateTest);
+        assertTrue("Number of comparisons :" + comp.getCount(), comp.getCount() == 2);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testInsertionSortStable() {
+        IntegerWrapper[] stableTest = new IntegerWrapper[4];
+        IntegerWrapper[] stableSorted = new IntegerWrapper[4];
+
+        IntegerWrapper element1 = new IntegerWrapper(1);
+        IntegerWrapper element2 = new IntegerWrapper(2);
+        IntegerWrapper element3 = new IntegerWrapper(2);
+        IntegerWrapper element4 = new IntegerWrapper(3);
+
+        stableTest[0] = element4;
+        stableTest[1] = element3;
+        stableTest[2] = element2;
+        stableTest[3] = element1;
+
+        SortingCopy.insertionSort(stableTest, comp);
+
+        stableSorted[0] = element1;
+        stableSorted[1] = element3;
+        stableSorted[2] = element2;
+        stableSorted[3] = element4;
+
+        assertArrayEquals(stableSorted, stableTest);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testInsertionSortAdaptive() {
+        IntegerWrapper[] adaptiveTest = new IntegerWrapper[4];
+        IntegerWrapper[] adaptiveSorted = new IntegerWrapper[4];
+
+        IntegerWrapper element1 = new IntegerWrapper(1);
+        IntegerWrapper element2 = new IntegerWrapper(2);
+        IntegerWrapper element3 = new IntegerWrapper(3);
+        IntegerWrapper element4 = new IntegerWrapper(4);
+
+        adaptiveTest[0] = element1;
+        adaptiveTest[1] = element2;
+        adaptiveTest[2] = element3;
+        adaptiveTest[3] = element4;
+
+        SortingCopy.insertionSort(adaptiveTest, comp);
+
+        adaptiveSorted[0] = element1;
+        adaptiveSorted[1] = element2;
+        adaptiveSorted[2] = element3;
+        adaptiveSorted[3] = element4;
+
+        assertArrayEquals(adaptiveSorted, adaptiveTest);
+        assertTrue("Number of comparisons :" + comp.getCount(), comp.getCount() == 3);
+    }
+
+    // replace with your partition method if you have one, otherwise just delete this
+    // also temporarily change your partition method to public
+//    @Test(timeout = TIMEOUT)
+//    public void testPartition() {
+//        Random random = new Random();
+//
+//        IntegerWrapper[] testArr = new IntegerWrapper[1000];
+//        for (int i = 0; i < testArr.length; i++) {
+//            testArr[i] = new IntegerWrapper(random.nextInt());
+//        }
+//
+//        boolean flag = false;
+//        for (int i = 0; i < testArr.length; i++) {
+//            int newPivotId = SortingCopy.partition(0, i, testArr.length - 1, testArr, comp);
+//            for (int j = 0; j < newPivotId; j++) {
+//                if (testArr[j].value > testArr[newPivotId].value) {
+//                    flag = true;
+//                }
+//            }
+//            for (int j = newPivotId + 1; j < testArr.length; j++) {
+//                if (testArr[j].value < testArr[newPivotId].value) {
+//                    flag = true;
+//                }
+//            }
+//        }
+//
+//        assertEquals(false, flag);
+//    }
+
+    @Test(timeout = TIMEOUT)
+    public void testInsertionSortWorst() {
+        IntegerWrapper[] adaptiveTest = new IntegerWrapper[4];
+        IntegerWrapper[] adaptiveSorted = new IntegerWrapper[4];
+
+        IntegerWrapper element1 = new IntegerWrapper(1);
+        IntegerWrapper element2 = new IntegerWrapper(2);
+        IntegerWrapper element3 = new IntegerWrapper(3);
+        IntegerWrapper element4 = new IntegerWrapper(4);
+
+        adaptiveTest[0] = element4;
+        adaptiveTest[1] = element3;
+        adaptiveTest[2] = element2;
+        adaptiveTest[3] = element1;
+
+        SortingCopy.insertionSort(adaptiveTest, comp);
+
+        adaptiveSorted[0] = element1;
+        adaptiveSorted[1] = element2;
+        adaptiveSorted[2] = element3;
+        adaptiveSorted[3] = element4;
+
+        assertArrayEquals(adaptiveSorted, adaptiveTest);
+        assertTrue("Number of comparisons :" + comp.getCount(), comp.getCount() == 6);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInsertionSortException1() {
+        IntegerWrapper[] exceptionTest = null;
+        SortingCopy.insertionSort(exceptionTest, comp);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInsertionSortException2() {
+        IntegerWrapper[] exceptionTest = new IntegerWrapper[2];
+        comp = null;
+        SortingCopy.insertionSort(exceptionTest, comp);
     }
 
     @Test(timeout = TIMEOUT)
     public void testMergeSort() {
-        Sorting.mergeSort(integers, comp);
-        assertArrayEquals("Merge sort failed", sortedIntegers, integers);
+        SortingCopy.mergeSort(integers, comp);
+        assertArrayEquals(sortedIntegers, integers);
+        assertTrue("Number of comparisons: " + comp.getCount(),
+                comp.getCount() <= 15 && comp.getCount() != 0);
     }
 
-    //  LSD Radix Sort
+    @Test(timeout = TIMEOUT)
+    public void testMergeSortWithEmpty() {
+        IntegerWrapper[] emptyTest = new IntegerWrapper[0];
+        IntegerWrapper[] emptySorted = new IntegerWrapper[0];
+        SortingCopy.mergeSort(emptyTest, comp);
+        assertArrayEquals(emptySorted, emptyTest);
+        assertTrue("Number of comparisons :" + comp.getCount(), comp.getCount() == 0);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testMergeSortWithOne() {
+        IntegerWrapper[] oneTest = new IntegerWrapper[1];
+        IntegerWrapper[] oneSorted = new IntegerWrapper[1];
+        oneTest[0] = new IntegerWrapper(5);
+        oneSorted[0] = new IntegerWrapper(5);
+        SortingCopy.mergeSort(oneTest, comp);
+        assertArrayEquals(oneSorted, oneTest);
+        assertTrue("Number of comparisons :" + comp.getCount(), comp.getCount() == 0);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testMergeSortStable() {
+        IntegerWrapper[] stableTest = new IntegerWrapper[4];
+        IntegerWrapper[] stableSorted = new IntegerWrapper[4];
+
+        IntegerWrapper element1 = new IntegerWrapper(1);
+        IntegerWrapper element2 = new IntegerWrapper(2);
+        IntegerWrapper element3 = new IntegerWrapper(2);
+        IntegerWrapper element4 = new IntegerWrapper(3);
+
+        stableTest[0] = element4;
+        stableTest[1] = element3;
+        stableTest[2] = element2;
+        stableTest[3] = element1;
+
+        SortingCopy.mergeSort(stableTest, comp);
+
+        stableSorted[0] = element1;
+        stableSorted[1] = element3;
+        stableSorted[2] = element2;
+        stableSorted[3] = element4;
+
+        assertArrayEquals(stableSorted, stableTest);
+        assertTrue("Number of comparisons :" + comp.getCount(), comp.getCount() != 0 && comp.getCount() <= 5);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMergeSortException1() {
+        IntegerWrapper[] exceptionTest = null;
+        SortingCopy.mergeSort(exceptionTest, comp);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMergeSortException2() {
+        IntegerWrapper[] exceptionTest = new IntegerWrapper[2];
+        comp = null;
+        SortingCopy.mergeSort(exceptionTest, comp);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testKthSelect() {
+        int randomSeed = 4;
+        assertEquals(new IntegerWrapper(0), SortingCopy.kthSelect(1,
+                integers, comp, new Random(randomSeed)));
+        assertTrue("Number of comparisons: " + comp.getCount(),
+                comp.getCount() <= 8 && comp.getCount() != 0);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testKthSelectDifferentData() {
+        int randomSeed = 4;
+        IntegerWrapper[] testArr = new IntegerWrapper[7];
+        IntegerWrapper element1 = new IntegerWrapper(-15);
+        IntegerWrapper element2 = new IntegerWrapper(-7);
+        IntegerWrapper element3 = new IntegerWrapper(-1);
+        IntegerWrapper element4 = new IntegerWrapper(0);
+        IntegerWrapper element5 = new IntegerWrapper(3);
+        IntegerWrapper element6 = new IntegerWrapper(28);
+        IntegerWrapper element7 = new IntegerWrapper(40);
+
+        testArr[0] = element3;
+        testArr[1] = element1;
+        testArr[2] = element2;
+        testArr[3] = element5;
+        testArr[4] = element6;
+        testArr[5] = element4;
+        testArr[6] = element7;
+
+        assertEquals(element1, SortingCopy.kthSelect(1, testArr, comp, new Random(randomSeed)));
+        assertTrue("Number of comparisons: " + comp.getCount(),
+                comp.getCount() <= 21 && comp.getCount() != 0);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testKthSelectDifferentk() {
+        int randomSeed = 4;
+        IntegerWrapper[] testArr = new IntegerWrapper[7];
+        IntegerWrapper element1 = new IntegerWrapper(-15);
+        IntegerWrapper element2 = new IntegerWrapper(-7);
+        IntegerWrapper element3 = new IntegerWrapper(-1);
+        IntegerWrapper element4 = new IntegerWrapper(0);
+        IntegerWrapper element5 = new IntegerWrapper(3);
+        IntegerWrapper element6 = new IntegerWrapper(28);
+        IntegerWrapper element7 = new IntegerWrapper(40);
+
+        testArr[0] = element3;
+        testArr[1] = element1;
+        testArr[2] = element2;
+        testArr[3] = element5;
+        testArr[4] = element6;
+        testArr[5] = element4;
+        testArr[6] = element7;
+
+        assertEquals(element7, SortingCopy.kthSelect(7, testArr, comp, new Random(randomSeed)));
+        assertTrue("Number of comparisons: " + comp.getCount(),
+                comp.getCount() <= 20 && comp.getCount() != 0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testKthSelectException1() {
+        integers = null;
+        IntegerWrapper result = SortingCopy.kthSelect(1, integers, comp, new Random(4));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testKthSelectException2() {
+        comp = null;
+        IntegerWrapper result = SortingCopy.kthSelect(1, integers, comp, new Random(4));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testKthSelectException3() { // there is no eligible choice for k if array is empty
+        integers = new IntegerWrapper[0];
+        IntegerWrapper result = SortingCopy.kthSelect(1, integers, comp, new Random(4));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testKthSelectionException4() {
+        IntegerWrapper result = SortingCopy.kthSelect(0, integers, comp, new Random(4));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testKthSelectionException5() {
+        IntegerWrapper result = SortingCopy.kthSelect(99, integers, comp, new Random(4));
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testHeapSort() {
+        int[] unsortedArray = new int[] {54, 28, 58, 84, 20, 122, -85, 3};
+        List<Integer> unsortedList = new ArrayList<>();
+        for (int i : unsortedArray) {
+            unsortedList.add(i);
+        }
+        int[] sortedArray = new int[] {-85, 3, 20, 28, 54, 58, 84, 122};
+        int[] actualArray = SortingCopy.heapSort(unsortedList);
+        assertArrayEquals(sortedArray, actualArray);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testHeapSortWithEmpty() {
+        List<Integer> emptyTest = new ArrayList<>();
+        int[] emptySorted = new int[0];
+        int[] actual = SortingCopy.heapSort(emptyTest);
+        assertArrayEquals(emptySorted, emptySorted);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testHeapSortWithOne() {
+        int[] oneTest = new int[] {3};
+        List<Integer> testList = new ArrayList<>();
+        testList.add(oneTest[0]);
+        int[] oneSorted = new int[] {3};
+        int[] actual = SortingCopy.heapSort(testList);
+        assertArrayEquals(oneSorted, actual);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testHeapSortWithDuplicates() {
+        int[] duplicateTest = new int[] {5, 5, 5};
+
+        List<Integer> testList = new ArrayList<>();
+
+        for (int i : duplicateTest) {
+            testList.add(i);
+        }
+
+        int[] duplicateSorted = new int[] {5, 5, 5};
+        int[] actual = SortingCopy.heapSort(testList);
+        assertArrayEquals(duplicateSorted, actual);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testHeapSortAlreadySorted() {
+        int[] sortedTest = new int[] {-12, -5, -3, 0, 1, 2, 14, 91};
+
+        List<Integer> testList = new ArrayList<>();
+
+        for (int i : sortedTest) {
+            testList.add(i);
+        }
+
+        int[] sortedResult = new int[] {-12, -5, -3, 0, 1, 2, 14, 91};
+        int[] actual = SortingCopy.heapSort(testList);
+
+        assertArrayEquals(sortedResult, actual);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testHeapSortException() {
+        List<Integer> exceptionTest = null;
+        SortingCopy.heapSort(exceptionTest);
+    }
+
     @Test(timeout = TIMEOUT)
     public void testLsdRadixSort() {
-        int[] array = {54, -23, 0, 5, -1000, 42};
-        int[] expected = {-1000, -23, 0, 5, 42, 54};
-        Sorting.lsdRadixSort(array);
-        assertArrayEquals("LSD Radix failed", expected, array);
+        int[] unsortedArray = new int[]{54, 28, 58, 84, 20, 122, -85, 3};
+        int[] sortedArray = new int[]{-85, 3, 20, 28, 54, 58, 84, 122};
+        SortingCopy.lsdRadixSort(unsortedArray);
+        assertArrayEquals(sortedArray, unsortedArray);
     }
 
-    //  Null Handling and Edge Cases
-    @Test(timeout = TIMEOUT, expected = IllegalArgumentException.class)
-    public void testNullArray() {
-        Sorting.insertionSort(null, comp);
-    }
-
-
-    //  Stability Check
     @Test(timeout = TIMEOUT)
-    public void testStability() {
-        IntegerWrapper[] stableArray = {
-                new IntegerWrapper(1),
-                new IntegerWrapper(2),
-                new IntegerWrapper(2),
-                new IntegerWrapper(3),
-                new IntegerWrapper(3)
-        };
-
-        Sorting.insertionSort(stableArray, comp);
-        assertEquals("Failed stability check", stableArray[1], stableArray[2]);
-        assertEquals("Failed stability check", stableArray[3], stableArray[4]);
+    public void testLsdRadixSortWithEmpty() {
+        int[] emptyTest = new int[0];
+        int[] emptySorted = new int[0];
+        SortingCopy.lsdRadixSort(emptyTest);
+        assertArrayEquals(emptySorted, emptyTest);
     }
 
-    //  Mixed Positive and Negative Values
     @Test(timeout = TIMEOUT)
-    public void testMixedNumbers() {
-        IntegerWrapper[] mixed = {
-                new IntegerWrapper(-50),
-                new IntegerWrapper(100),
-                new IntegerWrapper(-10),
-                new IntegerWrapper(0),
-                new IntegerWrapper(99)
-        };
-
-        IntegerWrapper[] expected = {
-                new IntegerWrapper(-50),
-                new IntegerWrapper(-10),
-                new IntegerWrapper(0),
-                new IntegerWrapper(99),
-                new IntegerWrapper(100)
-        };
-
-        Sorting.mergeSort(mixed, comp);
-        assertArrayEquals("Failed on mixed numbers", expected, mixed);
+    public void testLsdRadixSortWithOne() {
+        int[] oneTest = new int[] {3};
+        int[] oneSorted = new int[] {3};
+        SortingCopy.lsdRadixSort(oneTest);
+        assertArrayEquals(oneSorted, oneTest);
     }
 
-    //  Boundary Values
     @Test(timeout = TIMEOUT)
-    public void testBoundaryValues() {
-        IntegerWrapper[] boundary = {
-                new IntegerWrapper(Integer.MIN_VALUE),
-                new IntegerWrapper(0),
-                new IntegerWrapper(Integer.MAX_VALUE),
-                new IntegerWrapper(-1),
-                new IntegerWrapper(1)
-        };
+    public void testLsdRadixSortWithDuplicates() {
+        int[] duplicateTest = new int[] {5, 5, 5};
+        int[] duplicateSorted = new int[] {5, 5, 5};
 
-        IntegerWrapper[] expected = {
-                new IntegerWrapper(Integer.MIN_VALUE),
-                new IntegerWrapper(-1),
-                new IntegerWrapper(0),
-                new IntegerWrapper(1),
-                new IntegerWrapper(Integer.MAX_VALUE)
-        };
-
-        Sorting.mergeSort(boundary, comp);
-        assertArrayEquals("Failed on boundary values", expected, boundary);
+        SortingCopy.lsdRadixSort(duplicateTest);
+        assertArrayEquals(duplicateSorted, duplicateTest);
     }
 
-    //  Large Dataset (Stress Test)
     @Test(timeout = TIMEOUT)
-    public void testLargeDataset() {
-        Random random = new Random(42);
+    public void testLsdRadixSortAlreadySorted() {
+        int[] sortedTest = new int[] {-12, -5, -3, 0, 1, 2, 14, 91};
+        int[] sortedResult = new int[] {-12, -5, -3, 0, 1, 2, 14, 91};
 
-        IntegerWrapper[] largeArray = new IntegerWrapper[LARGE_SIZE];
-        IntegerWrapper[] expected = new IntegerWrapper[LARGE_SIZE];
-
-        for (int i = 0; i < LARGE_SIZE; i++) {
-            int val = random.nextInt();
-            largeArray[i] = new IntegerWrapper(val);
-            expected[i] = new IntegerWrapper(val);
-        }
-
-        Arrays.sort(expected, Comparator.comparing(IntegerWrapper::getValue));
-
-        Sorting.mergeSort(largeArray, comp);
-        assertArrayEquals("Failed on large dataset", expected, largeArray);
+        SortingCopy.lsdRadixSort(sortedTest);
+        assertArrayEquals(sortedResult, sortedTest);
     }
 
-    //  Repeated Randomized Testing for Consistency
-    @Test(timeout = TIMEOUT)
-    public void testRandomizedConsistency() {
-        Random rand = new Random(42);
-
-        for (int i = 0; i < 100; i++) {
-            int size = rand.nextInt(100) + 10;
-            IntegerWrapper[] arr = new IntegerWrapper[size];
-
-            for (int j = 0; j < size; j++) {
-                arr[j] = new IntegerWrapper(rand.nextInt(10000) - 5000);
-            }
-
-            IntegerWrapper[] expected = Arrays.copyOf(arr, arr.length);
-            Arrays.sort(expected, Comparator.comparing(IntegerWrapper::getValue));
-
-            Sorting.mergeSort(arr, comp);
-            assertArrayEquals("Failed on random test run #" + i, expected, arr);
-        }
-    }
-
-    //  Benchmarking Execution Time
-    @Test(timeout = TIMEOUT)
-    public void testPerformance() {
-        Random rand = new Random();
-        IntegerWrapper[] largeArray = new IntegerWrapper[LARGE_SIZE];
-
-        for (int i = 0; i < LARGE_SIZE; i++) {
-            largeArray[i] = new IntegerWrapper(rand.nextInt(100000));
-        }
-
-        long startTime = System.currentTimeMillis();
-        Sorting.mergeSort(largeArray, comp);
-        long duration = System.currentTimeMillis() - startTime;
-
-        System.out.println("MergeSort Time for " + LARGE_SIZE + " elements: " + duration + "ms");
-        assertTrue("Performance regression detected!", duration < 500);
+    @Test(expected = IllegalArgumentException.class)
+    public void testLsdRadixSortException() {
+        int[] exceptionTest = null;
+        SortingCopy.lsdRadixSort(exceptionTest);
     }
 
 
     @Test(timeout = TIMEOUT)
-    public void testSortInvariant() {
-        Random rand = new Random();
+    public void testCocktailSort() {
+        SortingCopy.cocktailSort(integers, comp);
+        assertArrayEquals(sortedIntegers, integers);
+        assertTrue("Number of comparisons: " + comp.getCount(),
+                comp.getCount() <= 21 && comp.getCount() != 0);
+    }
 
-        for (int i = 0; i < 100; i++) {
-            int size = rand.nextInt(100) + 1;
-            IntegerWrapper[] arr = new IntegerWrapper[size];
+    @Test(timeout = TIMEOUT)
+    public void testCocktailSortWithEmpty() {
+        IntegerWrapper[] emptyTest = new IntegerWrapper[0];
+        IntegerWrapper[] emptySorted = new IntegerWrapper[0];
+        SortingCopy.cocktailSort(emptyTest, comp);
+        assertArrayEquals(emptyTest, emptySorted);
+        assertTrue("Number of comparisons :" + comp.getCount(), comp.getCount() == 0);
+    }
 
-            for (int j = 0; j < size; j++) {
-                arr[j] = new IntegerWrapper(rand.nextInt(10000) - 5000);
-            }
+    @Test(timeout = TIMEOUT)
+    public void testCocktailSortWithOne() {
+        IntegerWrapper[] oneTest = new IntegerWrapper[1];
+        IntegerWrapper[] oneSorted = new IntegerWrapper[1];
+        oneTest[0] = new IntegerWrapper(5);
+        oneSorted[0] = new IntegerWrapper(5);
+        SortingCopy.cocktailSort(oneTest, comp);
+        assertArrayEquals(oneTest, oneSorted);
+        assertTrue("Number of comparisons :" + comp.getCount(), comp.getCount() == 0);
+    }
 
-            Sorting.mergeSort(arr, comp);
+    @Test(timeout = TIMEOUT)
+    public void testCocktailSortWithDuplicates() {
+        IntegerWrapper[] duplicateTest = new IntegerWrapper[8];
+        IntegerWrapper[] duplicateSorted = new IntegerWrapper[8];
+        IntegerWrapper element = new IntegerWrapper(1);
+        duplicateTest[0] = element;
+        duplicateTest[1] = element;
+        duplicateTest[2] = element;
+        duplicateTest[3] = element;
+        duplicateTest[4] = element;
+        duplicateTest[5] = element;
+        duplicateTest[6] = element;
+        duplicateTest[7] = element;
 
-            for (int k = 0; k < arr.length - 1; k++) {
-                assertTrue("Failed sort invariant at index " + k,
-                        arr[k].getValue() <= arr[k + 1].getValue());
-            }
-        }
+        duplicateSorted[0] = element;
+        duplicateSorted[1] = element;
+        duplicateSorted[2] = element;
+        duplicateSorted[3] = element;
+        duplicateSorted[4] = element;
+        duplicateSorted[5] = element;
+        duplicateSorted[6] = element;
+        duplicateSorted[7] = element;
+
+        SortingCopy.cocktailSort(duplicateTest, comp);
+        assertArrayEquals(duplicateSorted, duplicateTest);
+        assertTrue("Number of comparisons :" + comp.getCount(), comp.getCount() == 7);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testCocktailSortAlreadySorted() {
+        IntegerWrapper[] adaptiveTest = new IntegerWrapper[4];
+        IntegerWrapper[] adaptiveSorted = new IntegerWrapper[4];
+
+        IntegerWrapper element1 = new IntegerWrapper(1);
+        IntegerWrapper element2 = new IntegerWrapper(2);
+        IntegerWrapper element3 = new IntegerWrapper(3);
+        IntegerWrapper element4 = new IntegerWrapper(4);
+
+        adaptiveTest[0] = element1;
+        adaptiveTest[1] = element2;
+        adaptiveTest[2] = element3;
+        adaptiveTest[3] = element4;
+
+        SortingCopy.cocktailSort(adaptiveTest, comp);
+
+        adaptiveSorted[0] = element1;
+        adaptiveSorted[1] = element2;
+        adaptiveSorted[2] = element3;
+        adaptiveSorted[3] = element4;
+
+        assertArrayEquals(adaptiveSorted, adaptiveTest);
+        assertTrue("Number of comparisons :" + comp.getCount(), comp.getCount() == 3);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testCocktailSortStable() {
+        IntegerWrapper[] stableTest = new IntegerWrapper[4];
+        IntegerWrapper[] stableSorted = new IntegerWrapper[4];
+
+        IntegerWrapper element1 = new IntegerWrapper(1);
+        IntegerWrapper element2 = new IntegerWrapper(2);
+        IntegerWrapper element3 = new IntegerWrapper(2);
+        IntegerWrapper element4 = new IntegerWrapper(3);
+
+        stableTest[0] = element4;
+        stableTest[1] = element3;
+        stableTest[2] = element2;
+        stableTest[3] = element1;
+
+        SortingCopy.cocktailSort(stableTest, comp);
+
+        stableSorted[0] = element1;
+        stableSorted[1] = element3;
+        stableSorted[2] = element2;
+        stableSorted[3] = element4;
+
+        assertArrayEquals(stableSorted, stableTest);
+        assertTrue("Number of comparisons :" + comp.getCount(), comp.getCount() == 6);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testCocktailSortWorst() {
+        IntegerWrapper[] adaptiveTest = new IntegerWrapper[4];
+        IntegerWrapper[] adaptiveSorted = new IntegerWrapper[4];
+
+        IntegerWrapper element1 = new IntegerWrapper(1);
+        IntegerWrapper element2 = new IntegerWrapper(2);
+        IntegerWrapper element3 = new IntegerWrapper(3);
+        IntegerWrapper element4 = new IntegerWrapper(4);
+
+        adaptiveTest[0] = element4;
+        adaptiveTest[1] = element3;
+        adaptiveTest[2] = element2;
+        adaptiveTest[3] = element1;
+
+        SortingCopy.cocktailSort(adaptiveTest, comp);
+
+        adaptiveSorted[0] = element1;
+        adaptiveSorted[1] = element2;
+        adaptiveSorted[2] = element3;
+        adaptiveSorted[3] = element4;
+
+        assertArrayEquals(adaptiveSorted, adaptiveTest);
+        assertTrue("Number of comparisons :" + comp.getCount(), comp.getCount() == 6);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCocktailSortException1() {
+        IntegerWrapper[] exceptionTest = null;
+        SortingCopy.cocktailSort(exceptionTest, comp);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCocktailSortException2() {
+        IntegerWrapper[] exceptionTest = new IntegerWrapper[2];
+        comp = null;
+        SortingCopy.cocktailSort(exceptionTest, comp);
     }
 
     /**
-     * Class for testing proper sorting.
+     * Class for testing proper SortingCopy.
      */
     private static class IntegerWrapper {
         private Integer value;
