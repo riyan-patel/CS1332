@@ -156,7 +156,7 @@ public class Sorting {
      *                                            null
      */
     public static <T> void mergeSort(T[] arr, Comparator<T> comparator) {
-        if (arr == null && comparator == null) {
+        if (arr == null || comparator == null) {
             throw new IllegalArgumentException("arr and comparator can't be null");
         }
         if (arr.length > 1) {
