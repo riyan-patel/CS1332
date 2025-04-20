@@ -1,7 +1,6 @@
 import org.junit.Before;
 import org.junit.Test;
 
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -13,22 +12,26 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Basic student tests to check GraphAlgorithms. These tests are in
+ * Basic student tests to check GraphAlgorithmsNehal. These tests are in
  * no way comprehensive nor do they guarantee any kind of grade.
  *
- * @author CS 1332 TAs
+ * @author Jacob Young, CS 1332 TAs
  * @version 1.0
  */
 public class GraphAlgorithmsStudentTests {
 
     private Graph<Integer> directedGraph;
+    private Graph<Character> directedGraph2;
     private Graph<Character> undirectedGraph;
+    private Graph<Character> undirectedGraph2;
     public static final int TIMEOUT = 200;
 
     @Before
     public void init() {
         directedGraph = createDirectedGraph();
+        directedGraph2 = createDirectedGraph2();
         undirectedGraph = createUndirectedGraph();
+        undirectedGraph2 = createUndirectedGraph2();
     }
 
     /**
@@ -54,6 +57,46 @@ public class GraphAlgorithmsStudentTests {
         edges.add(new Edge<>(new Vertex<>(7), new Vertex<>(6), 0));
 
         return new Graph<Integer>(vertices, edges);
+    }
+
+    /**
+     * Creates a directed graph.
+     * The graph is based on the Small Graph from csvistool.com
+     *
+     * @return the completed graph
+     */
+    private Graph<Character> createDirectedGraph2() {
+        Set<Vertex<Character>> vertices = new HashSet<Vertex<Character>>();
+        for (int i = 65; i <= 72; i++) {
+            if (i == 67) {
+                continue;
+            }
+            vertices.add(new Vertex<Character>((char) i));
+        }
+
+        Set<Edge<Character>> edges = new LinkedHashSet<Edge<Character>>();
+        edges.add(new Edge<>(new Vertex<>('A'), new Vertex<>('B'), 8));
+        edges.add(new Edge<>(new Vertex<>('A'), new Vertex<>('E'), 6));
+
+        edges.add(new Edge<>(new Vertex<>('B'), new Vertex<>('A'), 8));
+
+        edges.add(new Edge<>(new Vertex<>('D'), new Vertex<>('F'), 3));
+
+        edges.add(new Edge<>(new Vertex<>('E'), new Vertex<>('A'), 6));
+        edges.add(new Edge<>(new Vertex<>('E'), new Vertex<>('H'), 4));
+
+        edges.add(new Edge<>(new Vertex<>('F'), new Vertex<>('D'), 3));
+        edges.add(new Edge<>(new Vertex<>('F'), new Vertex<>('G'), 7));
+        edges.add(new Edge<>(new Vertex<>('F'), new Vertex<>('H'), 9));
+
+        edges.add(new Edge<>(new Vertex<>('G'), new Vertex<>('F'), 7));
+        edges.add(new Edge<>(new Vertex<>('G'), new Vertex<>('H'), 6));
+
+        edges.add(new Edge<>(new Vertex<>('H'), new Vertex<>('E'), 4));
+        edges.add(new Edge<>(new Vertex<>('H'), new Vertex<>('F'), 9));
+        edges.add(new Edge<>(new Vertex<>('H'), new Vertex<>('G'), 6));
+
+        return new Graph<Character>(vertices, edges);
     }
 
     /**
@@ -89,10 +132,49 @@ public class GraphAlgorithmsStudentTests {
         return new Graph<Character>(vertices, edges);
     }
 
+    /**
+     * Creates an undirected graph.
+     * The graph is based on the Small Graph from csvistool.com
+     *
+     * @return the completed graph
+     */
+    private Graph<Character> createUndirectedGraph2() {
+        Set<Vertex<Character>> vertices = new HashSet<>();
+        for (int i = 65; i <= 72; i++) {
+            if (i == 67) {
+                continue;
+            }
+            vertices.add(new Vertex<Character>((char) i));
+        }
+
+        Set<Edge<Character>> edges = new LinkedHashSet<>();
+        edges.add(new Edge<>(new Vertex<>('A'), new Vertex<>('B'), 8));
+        edges.add(new Edge<>(new Vertex<>('A'), new Vertex<>('E'), 6));
+
+        edges.add(new Edge<>(new Vertex<>('B'), new Vertex<>('A'), 8));
+
+        edges.add(new Edge<>(new Vertex<>('D'), new Vertex<>('F'), 3));
+
+        edges.add(new Edge<>(new Vertex<>('E'), new Vertex<>('A'), 6));
+        edges.add(new Edge<>(new Vertex<>('E'), new Vertex<>('H'), 4));
+
+        edges.add(new Edge<>(new Vertex<>('F'), new Vertex<>('D'), 3));
+        edges.add(new Edge<>(new Vertex<>('F'), new Vertex<>('G'), 7));
+        edges.add(new Edge<>(new Vertex<>('F'), new Vertex<>('H'), 9));
+
+        edges.add(new Edge<>(new Vertex<>('G'), new Vertex<>('F'), 7));
+        edges.add(new Edge<>(new Vertex<>('G'), new Vertex<>('H'), 6));
+
+        edges.add(new Edge<>(new Vertex<>('H'), new Vertex<>('E'), 4));
+        edges.add(new Edge<>(new Vertex<>('H'), new Vertex<>('F'), 9));
+        edges.add(new Edge<>(new Vertex<>('H'), new Vertex<>('G'), 6));
+
+        return new Graph<Character>(vertices, edges);
+    }
+
     @Test(timeout = TIMEOUT)
     public void testBFS() {
-        List<Vertex<Integer>> bfsActual = GraphAlgorithms.bfs(
-                new Vertex<Integer>(1), directedGraph);
+        List<Vertex<Integer>> bfsActual = GraphAlgorithmsNehal.bfs(new Vertex<Integer>(1), directedGraph);
 
         List<Vertex<Integer>> bfsExpected = new LinkedList<>();
         bfsExpected.add(new Vertex<Integer>(1));
@@ -107,9 +189,24 @@ public class GraphAlgorithmsStudentTests {
     }
 
     @Test(timeout = TIMEOUT)
+    public void testBFS2() {
+        List<Vertex<Character>> bfsActual = GraphAlgorithmsNehal.bfs(new Vertex<Character>('A'), directedGraph2);
+
+        List<Vertex<Character>> bfsExpected = new LinkedList<>();
+        bfsExpected.add(new Vertex<Character>('A'));
+        bfsExpected.add(new Vertex<Character>('B'));
+        bfsExpected.add(new Vertex<Character>('E'));
+        bfsExpected.add(new Vertex<Character>('H'));
+        bfsExpected.add(new Vertex<Character>('F'));
+        bfsExpected.add(new Vertex<Character>('G'));
+        bfsExpected.add(new Vertex<Character>('D'));
+
+        assertEquals(bfsExpected, bfsActual);
+    }
+
+    @Test(timeout = TIMEOUT)
     public void testDFS() {
-        List<Vertex<Integer>> dfsActual = GraphAlgorithms.dfs(
-                new Vertex<Integer>(5), directedGraph);
+        List<Vertex<Integer>> dfsActual = GraphAlgorithmsNehal.dfs(new Vertex<Integer>(5), directedGraph);
 
         List<Vertex<Integer>> dfsExpected = new LinkedList<>();
         dfsExpected.add(new Vertex<Integer>(5));
@@ -121,9 +218,25 @@ public class GraphAlgorithmsStudentTests {
     }
 
     @Test(timeout = TIMEOUT)
+    public void testDFS2() {
+        List<Vertex<Character>> dfsActual = GraphAlgorithmsNehal.dfs(new Vertex<Character>('A'), directedGraph2);
+
+        List<Vertex<Character>> dfsExpected = new LinkedList<>();
+        dfsExpected.add(new Vertex<Character>('A'));
+        dfsExpected.add(new Vertex<Character>('B'));
+        dfsExpected.add(new Vertex<Character>('E'));
+        dfsExpected.add(new Vertex<Character>('H'));
+        dfsExpected.add(new Vertex<Character>('F'));
+        dfsExpected.add(new Vertex<Character>('D'));
+        dfsExpected.add(new Vertex<Character>('G'));
+
+        assertEquals(dfsExpected, dfsActual);
+    }
+
+    @Test(timeout = TIMEOUT)
     public void testDijkstras() {
-        Map<Vertex<Character>, Integer> dijkActual = GraphAlgorithms.dijkstras(
-                new Vertex<Character>('D'), undirectedGraph);
+        Map<Vertex<Character>, Integer> dijkActual = GraphAlgorithmsNehal.dijkstras(new Vertex<Character>('D'),
+                undirectedGraph);
         Map<Vertex<Character>, Integer> dijkExpected = new HashMap<>();
         dijkExpected.put(new Vertex<>('A'), 4);
         dijkExpected.put(new Vertex<>('B'), 4);
@@ -136,9 +249,25 @@ public class GraphAlgorithmsStudentTests {
     }
 
     @Test(timeout = TIMEOUT)
+    public void testDijkstras2() {
+        Map<Vertex<Character>, Integer> dijkActual = GraphAlgorithmsNehal.dijkstras(new Vertex<Character>('A'),
+                undirectedGraph2);
+        Map<Vertex<Character>, Integer> dijkExpected = new HashMap<>();
+        dijkExpected.put(new Vertex<>('A'), 0);
+        dijkExpected.put(new Vertex<>('B'), 8);
+        // dijkExpected.put(new Vertex<>('C'), Integer.MAX_VALUE);
+        dijkExpected.put(new Vertex<>('D'), 22);
+        dijkExpected.put(new Vertex<>('E'), 6);
+        dijkExpected.put(new Vertex<>('F'), 19);
+        dijkExpected.put(new Vertex<>('G'), 16);
+        dijkExpected.put(new Vertex<>('H'), 10);
+
+        assertEquals(dijkExpected, dijkActual);
+    }
+
+    @Test(timeout = TIMEOUT)
     public void testPrims() {
-        Set<Edge<Character>> mstActual = GraphAlgorithms.prims(
-            new Vertex<>('A'), undirectedGraph);
+        Set<Edge<Character>> mstActual = GraphAlgorithmsNehal.prims(new Vertex<>('A'), undirectedGraph);
         Set<Edge<Character>> edges = new HashSet<>();
         edges.add(new Edge<>(new Vertex<>('C'), new Vertex<>('D'), 2));
         edges.add(new Edge<>(new Vertex<>('D'), new Vertex<>('C'), 2));
@@ -155,9 +284,28 @@ public class GraphAlgorithmsStudentTests {
     }
 
     @Test(timeout = TIMEOUT)
+    public void testPrims2() {
+        Set<Edge<Character>> mstActual = GraphAlgorithmsNehal.prims(new Vertex<>('A'), undirectedGraph2);
+        Set<Edge<Character>> edges = new HashSet<>();
+        edges.add(new Edge<>(new Vertex<>('A'), new Vertex<>('E'), 6));
+        edges.add(new Edge<>(new Vertex<>('E'), new Vertex<>('A'), 6));
+        edges.add(new Edge<>(new Vertex<>('E'), new Vertex<>('H'), 4));
+        edges.add(new Edge<>(new Vertex<>('H'), new Vertex<>('E'), 4));
+        edges.add(new Edge<>(new Vertex<>('H'), new Vertex<>('G'), 6));
+        edges.add(new Edge<>(new Vertex<>('G'), new Vertex<>('H'), 6));
+        edges.add(new Edge<>(new Vertex<>('G'), new Vertex<>('F'), 7));
+        edges.add(new Edge<>(new Vertex<>('F'), new Vertex<>('G'), 7));
+        edges.add(new Edge<>(new Vertex<>('F'), new Vertex<>('D'), 3));
+        edges.add(new Edge<>(new Vertex<>('D'), new Vertex<>('F'), 3));
+        edges.add(new Edge<>(new Vertex<>('A'), new Vertex<>('B'), 8));
+        edges.add(new Edge<>(new Vertex<>('B'), new Vertex<>('A'), 8));
+
+        assertEquals(edges, mstActual);
+    }
+
+    @Test(timeout = TIMEOUT)
     public void testKruskals() {
-        Set<Edge<Character>> mstActual = GraphAlgorithms.kruskals(
-            undirectedGraph);
+        Set<Edge<Character>> mstActual = GraphAlgorithmsNehal.kruskals(undirectedGraph);
 
         Set<Edge<Character>> mstExpected = new HashSet<>();
         mstExpected.add(new Edge<>(new Vertex<>('C'), new Vertex<>('D'), 2));
@@ -170,6 +318,27 @@ public class GraphAlgorithmsStudentTests {
         mstExpected.add(new Edge<>(new Vertex<>('E'), new Vertex<>('B'), 3));
         mstExpected.add(new Edge<>(new Vertex<>('E'), new Vertex<>('F'), 6));
         mstExpected.add(new Edge<>(new Vertex<>('F'), new Vertex<>('E'), 6));
+
+        assertEquals(mstExpected, mstActual);
+    }
+
+    @Test(timeout = TIMEOUT)
+    public void testKruskals2() {
+        Set<Edge<Character>> mstActual = GraphAlgorithmsNehal.kruskals(undirectedGraph2);
+
+        Set<Edge<Character>> mstExpected = new HashSet<>();
+        mstExpected.add(new Edge<>(new Vertex<>('D'), new Vertex<>('F'), 3));
+        mstExpected.add(new Edge<>(new Vertex<>('F'), new Vertex<>('D'), 3));
+        mstExpected.add(new Edge<>(new Vertex<>('E'), new Vertex<>('H'), 4));
+        mstExpected.add(new Edge<>(new Vertex<>('H'), new Vertex<>('E'), 4));
+        mstExpected.add(new Edge<>(new Vertex<>('A'), new Vertex<>('E'), 6));
+        mstExpected.add(new Edge<>(new Vertex<>('E'), new Vertex<>('A'), 6));
+        mstExpected.add(new Edge<>(new Vertex<>('G'), new Vertex<>('H'), 6));
+        mstExpected.add(new Edge<>(new Vertex<>('H'), new Vertex<>('G'), 6));
+        mstExpected.add(new Edge<>(new Vertex<>('F'), new Vertex<>('G'), 7));
+        mstExpected.add(new Edge<>(new Vertex<>('G'), new Vertex<>('F'), 7));
+        mstExpected.add(new Edge<>(new Vertex<>('A'), new Vertex<>('B'), 8));
+        mstExpected.add(new Edge<>(new Vertex<>('B'), new Vertex<>('A'), 8));
 
         assertEquals(mstExpected, mstActual);
     }
